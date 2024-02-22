@@ -15,29 +15,14 @@
  */
 class Solution {
     public boolean isSameTree(TreeNode p, TreeNode q) {
-        Stack <TreeNode> stackp = new Stack <>();
-        Stack <TreeNode> stackq = new Stack <>();
-
-        stackp.push(p);
-        stackq.push(q);
-
-        while (!stackp.isEmpty() && !stackq.isEmpty()) {
-            TreeNode node1 = stackp.pop();
-            TreeNode node2 = stackq.pop();
-
-            if (node1 == null && node2 == null) {
-                continue;
-            }
-            
-            else if (node1 == null || node2 == null || node1.val != node2.val) {
-                return false;
-            }
-
-            stackp.push(node1.left);
-            stackp.push(node1.right);
-            stackq.push(node2.left);
-            stackq.push(node2.right);
+        if (p == null && q == null) {
+            return true;
         }
-        return stackp.isEmpty() && stackq.isEmpty();
+        if (p == null || q == null || p.val != q.val) {
+            return false;
+        }
+        
+        return isSameTree(p.left,q.left) && isSameTree(p.right,q.right);
     }
+    
 }
