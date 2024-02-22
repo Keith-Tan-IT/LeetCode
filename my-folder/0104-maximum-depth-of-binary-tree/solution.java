@@ -16,32 +16,11 @@
 class Solution {
     public int maxDepth(TreeNode root) {
         if (root == null) {
-            return 0; 
+            return 0;
         }
-        Stack <TreeNode> node = new Stack();
-        Stack <Integer> depths = new Stack();
-        node.push(root);
-        depths.push(1);
-        int max = 1;
-
-        while (!node.isEmpty()) {
-            TreeNode current = node.pop();
-            int depth = depths.pop();
-            if (current.right == null && current.left == null) {
-                max = Math.max(depth,max);
-            }
-
-            if (current.right != null) {
-                node.push(current.right);
-                depths.push(depth + 1);
-            }
-            
-            if (current.left != null) {
-                node.push(current.left);
-                depths.push(depth + 1);
-            }
-            
+        int left = maxDepth(root.left);
+        int right = maxDepth(root.right);
+        
+        return 1 + Math.max(left,right);
         }
-        return max;
-    }
 }
