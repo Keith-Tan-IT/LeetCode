@@ -26,7 +26,7 @@ class Solution {
             }
         }
 
-        if (newChar1 != newChar2 || !map1.keySet().equals(map2.keySet())) {
+        if (!map1.keySet().equals(map2.keySet())) {
             return false;
         }
 
