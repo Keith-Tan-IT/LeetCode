@@ -14,38 +14,31 @@
  * }
  */
 class Solution {
-    public class SpecialNode {
-        TreeNode root;
-        List<Integer> path ;
-        int sum;
-
-        public SpecialNode (TreeNode root, List<Integer> path, int sum) {
-            this.root = root;
-            this.path = new ArrayList(path);
-            this.sum = sum;
-        }
-    }
     public List<List<Integer>> pathSum(TreeNode root, int targetSum) {
-        List<List<Integer>> result = new ArrayList<>();
-        Stack<SpecialNode> stack = new Stack<>();
-        stack.push(new SpecialNode(root, new ArrayList<>(), targetSum));
-        while (!stack.isEmpty()) {
-            SpecialNode node = stack.pop();
-            TreeNode curr = node.root;
-            List<Integer> path = node.path;
-            System.out.println(path);
-            int sum = node.sum;
-            if (curr != null) {
-                path.add(curr.val);
-                if(curr.right == null && curr.left == null && sum == curr.val) {
-                    result.add(path);
-                }
-                stack.push(new SpecialNode(curr.right, path, sum - curr.val));
-                stack.push(new SpecialNode(curr.left, path, sum - curr.val));
+        List < List <Integer>> result = new LinkedList<>();
+        List<Integer> path = new LinkedList<>();
+        dfs(root, targetSum, path, result);
+        return result;
+    }
+
+    public void dfs (TreeNode root, int targetSum, List path, List <List<Integer>> result) {
+        if (root == null) {
+            return;
+        }
+        path.add(root.val);
+        if (root.right == null && root.left == null) {
+            if (root.val == targetSum) {
+                result.add(new LinkedList(path));
             }
         }
-        return result;
-
+        else {
+            if (root.left != null) {
+                dfs(root.left, targetSum - root.val, path, result);
+            }
+            if (root.right != null) {
+                dfs(root.right, targetSum - root.val, path, result);
+            }    
+        }
+        path.remove(path.size()-1);
     }
-    
 }
