@@ -14,38 +14,38 @@
  * }
  */
 class Solution {
+    public class SpecialNode {
+        TreeNode root;
+        List<Integer> path ;
+        int sum;
+
+        public SpecialNode (TreeNode root, List<Integer> path, int sum) {
+            this.root = root;
+            this.path = new ArrayList(path);
+            this.sum = sum;
+        }
+    }
     public List<List<Integer>> pathSum(TreeNode root, int targetSum) {
-        List<Integer> path = new LinkedList <>();
-        List<List<Integer>> result = new LinkedList<>();
-        Stack<TreeNode> stack = new Stack<>();
-        TreeNode curr = root;
-        TreeNode prev = null;
-        int sum = 0;
-        while (curr != null || !stack.empty()) {
-            while (curr != null) {
-                stack.push(curr);
-                path.add(curr.val);
-                sum += curr.val;
-                curr = curr.left;
-                System.out.println(path);
-            }
-            curr = stack.peek();
-            if (curr.right != null && curr.right != prev) {
-                curr = curr.right;
-                continue;
-            }
-            if (curr.left == null && curr.right == null) {
-                if (sum == targetSum) {
-                    result.add(new LinkedList(path));
-                }
-            }
+        List<List<Integer>> result = new ArrayList<>();
+        Stack<SpecialNode> stack = new Stack<>();
+        stack.push(new SpecialNode(root, new ArrayList<>(), targetSum));
+        while (!stack.isEmpty()) {
+            SpecialNode node = stack.pop();
+            TreeNode curr = node.root;
+            List<Integer> path = node.path;
             System.out.println(path);
-            stack.pop();
-            path.removeLast();
-            sum -= curr.val;
-            prev = curr;
-            curr = null;
+            int sum = node.sum;
+            if (curr != null) {
+                path.add(curr.val);
+                if(curr.right == null && curr.left == null && sum == curr.val) {
+                    result.add(path);
+                }
+                stack.push(new SpecialNode(curr.right, path, sum - curr.val));
+                stack.push(new SpecialNode(curr.left, path, sum - curr.val));
+            }
         }
         return result;
+
     }
+    
 }
