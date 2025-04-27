@@ -1,52 +1,20 @@
-
-/**
- * TIP
- * Problem context: Graph traversal problems using adjacency matrices or lists
- *
- * Summary:
- * - `int[][] isConnected` → 2D array; use `isConnected.length` to get number of rows.
- * - `List<List<Integer>> rooms` → list of lists; use `rooms.size()` to get number of rooms.
- * - For 1D array: `int[] array` → `array.length` gives size.
- * - For a list: `List<Integer> list` → `list.size()` gives number of elements.
- *
- * Pitfalls:
- * - `.length` for arrays, `.size()` for lists — don't confuse them.
- * - Accessing out-of-bound indices will throw exceptions.
- * - Initializing 2D arrays vs list-of-lists differs:
- *   - `new int[n][m]` → rows and columns fixed
- *   - `List<List<Integer>> rooms = new ArrayList<>()` → flexible size, must init inner lists
- *
- * Example:
- * int[][] isConnected = {{1,1,0},{1,1,0},{0,0,1}};
- * System.out.println(isConnected.length); // 3
- * List<List<Integer>> rooms = new ArrayList<>();
- * rooms.add(Arrays.asList(1,0));
- * System.out.println(rooms.size()); // 1
- *
- * Key points:
- * - Arrays: fixed size, use `.length`.
- * - Lists: dynamic size, use `.size()`.
- * - Common in graph problems: adjacency matrix (`isConnected`) or adjacency list (`rooms`).
- */
-
 class Solution {
     public int findCircleNum(int[][] isConnected) {
-        int circleNum = 0;
-        int[] visited = new int[isConnected.length];
+        int provinceCount = 0;
+        boolean[] visited = new boolean[isConnected.length];
         for (int i = 0; i < isConnected.length; i++) {
-            if (visited[i] == 0) {
-                dfs(isConnected, visited, i);
-                circleNum++;
+            if (!visited[i]) {
+                dfs(i, isConnected, visited);
+                provinceCount++;
             }
         }
-        return circleNum;
+        return provinceCount;
     }
-
-    public void dfs(int[][] isConnected, int[] visited, int i) {
+    public void dfs (int i, int[][] isConnected, boolean[] visited) {
+        visited[i] = true;
         for (int j = 0; j < isConnected.length; j++) {
-            if (isConnected[i][j] == 1 && visited[j] == 0) {
-                visited[j] = 1;
-                dfs(isConnected, visited, j);
+            if (isConnected[i][j] == 1 && !visited[j]) {
+                dfs(j, isConnected, visited);
             }
         }
     }
