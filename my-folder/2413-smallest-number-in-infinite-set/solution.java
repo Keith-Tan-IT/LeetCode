@@ -1,27 +1,26 @@
 class SmallestInfiniteSet {
-    PriorityQueue<Integer> heap;
-    int current;
+    private PriorityQueue<Integer> heap;
+    int current_min;
+
     public SmallestInfiniteSet() {
-        heap  = new PriorityQueue<>();
-        current = 1;
+        heap = new PriorityQueue<>();
+        current_min = 1;
     }
     
     public int popSmallest() {
-        int smallest = current;
-        if(!heap.isEmpty() && heap.peek() < current) {
-            smallest = heap.poll();
+        if(!heap.isEmpty()) {
+            return heap.poll();
         }
         else {
-            current++;
+            current_min++;
+            return current_min - 1;
         }
-        while (!heap.isEmpty() && heap.peek() == smallest) {
-            heap.poll();
-        }
-        return smallest;
     }
     
     public void addBack(int num) {
-        heap.offer(num);
+        if(num < current_min && !heap.contains(num)) {
+            heap.offer(num);
+        }
     }
 }
 
