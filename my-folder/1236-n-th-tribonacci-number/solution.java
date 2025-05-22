@@ -1,19 +1,11 @@
 class Solution {
     public int tribonacci(int n) {
-        if (n == 0) {
-            return 0;
-        }
-        if (n == 1 || n == 2) {
-            return 1;
-        }
-        int t0 = 0, t1 = 1, t2 = 1;
-        int nextTribonacci = 0;
+        int[] F = new int[38];
+        F[0] = 0;
+        F[1] = F[2] = 1;
         for (int i = 3; i <= n; i++) {
-            nextTribonacci = t0 + t1 + t2;
-            t0 = t1; 
-            t1 = t2;
-            t2 = nextTribonacci;
+            F[i] = F[i-1] + F[i-2] + F[i-3];
         }
-        return nextTribonacci;
+        return F[n];
     }
 }
