@@ -2,15 +2,17 @@ class Solution {
     public int minFlips(int a, int b, int c) {
         int flips = 0;
         while (a > 0 || b > 0 || c > 0) {
-            int abit = a & 1;
-            int bbit = b & 1;
-            int cbit = c & 1;
-            if ((abit | bbit) != cbit) {
-                if (cbit == 1) {
+            if ((c & 1) == 1) {
+                if ((a & 1) == 0 && (b & 1) == 0) {
                     flips++;
                 }
-                else {
-                    flips += abit + bbit;
+            }
+            else {
+                if ((a & 1) == 1 && (b & 1) == 1) {
+                    flips += 2;
+                }
+                else if ((a & 1) == 1 || (b & 1) == 1) {
+                    flips++;
                 }
             }
             a >>= 1; 
