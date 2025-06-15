@@ -1,25 +1,15 @@
 class Solution {
     public int maxProfit(int[] prices) {
-        int n = prices.length;
-        int[][][] dp = new int[n + 1][2][3];
-        for (int day = n - 1; day >= 0; day--) {
-            for (int canBuy = 0; canBuy <= 1; canBuy++) {
-                for (int transactionLeft = 1; transactionLeft <= 2; transactionLeft++) {
-                    if (canBuy == 1) {
-                        dp[day][canBuy][transactionLeft] = Math.max(
-                            -prices[day] + dp[day + 1][0][transactionLeft], //buy
-                            dp[day + 1][1][transactionLeft] //skip
-                        );
-                    }
-                    else {
-                        dp[day][canBuy][transactionLeft] = Math.max(
-                            prices[day] + dp[day + 1][1][transactionLeft - 1], 
-                            dp[day + 1][0][transactionLeft]
-                        );
-                    }
-                }
-            }
+        int buy1 = Integer.MIN_VALUE;
+        int sell1 = 0;
+        int buy2 = Integer.MIN_VALUE;
+        int sell2 = 0;
+        for (int i = 0; i < prices.length; i++) {
+            buy1 = Math.max(buy1, -prices[i]);
+            sell1 = Math.max(sell1, buy1 + prices[i]);
+            buy2 = Math.max(buy2, sell1 - prices[i]);
+            sell2 = Math.max(sell2, buy2 + prices[i]);
         }
-    return dp[0][1][2];
+        return sell2;
     }
 }
