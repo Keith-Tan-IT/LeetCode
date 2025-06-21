@@ -1,27 +1,25 @@
 class Solution {
-    Integer[][][] memo;
     public int maxProfit(int[] prices) {
         int n = prices.length;
-        memo = new Integer[n][2][3];
-        return dfs(prices, 0, 1, 2);
-    }
-    public int dfs(int[] prices, int index, int canBuy, int transactionLeft) {
-        if (index == prices.length || transactionLeft == 0) {
-            return 0;
+        int[][][] dp = new int[n + 1][2][3];
+        for (int day = n - 1; day >= 0; day--) {
+            for (int canBuy = 0; canBuy <= 1; canBuy++) {
+                for (int transactionLeft = 1; transactionLeft <= 2; transactionLeft++) {
+                    if (canBuy == 1) {
+                        dp[day][canBuy][transactionLeft] = Math.max(
+                            -prices[day] + dp[day + 1][0][transactionLeft], //buy
+                            dp[day + 1][1][transactionLeft] //skip
+                        );
+                    }
+                    else {
+                        dp[day][canBuy][transactionLeft] = Math.max(
+                            prices[day] + dp[day + 1][1][transactionLeft - 1], 
+                            dp[day + 1][0][transactionLeft]
+                        );
+                    }
+                }
+            }
         }
-        if (memo[index][canBuy][transactionLeft] != null) {
-            return memo[index][canBuy][transactionLeft];
-        }
-        if (canBuy == 1) {
-            int buy = -prices[index] + dfs(prices, index + 1, 0, transactionLeft);
-            int skip = dfs(prices, index + 1, 1, transactionLeft);
-            memo[index][canBuy][transactionLeft] = Math.max(buy, skip);
-        }
-        else {
-            int sell = prices[index] + dfs(prices, index + 1, 1, transactionLeft - 1);
-            int skip = dfs(prices, index + 1, 0, transactionLeft);
-            memo[index][canBuy][transactionLeft] = Math.max(sell, skip);
-        }
-        return memo[index][canBuy][transactionLeft];
+    return dp[0][1][2];
     }
 }
