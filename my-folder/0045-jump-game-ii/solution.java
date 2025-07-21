@@ -1,20 +1,17 @@
 class Solution {
     public int jump(int[] nums) {
-        int[] dp = new int[nums.length];
-        Arrays.fill(dp, 10001);
-        return dfs(nums, 0, dp);
-    }
-    public int dfs (int[] nums, int position, int[] dp) {
-        if (position > nums.length - 2) {
-            return 0;
+        int end = 0, farthest = 0, jump = 0;
+        for (int i = 0; i < nums.length - 1; i++) {
+            farthest = Math.max(farthest, i + nums[i]);
+            if (farthest >= nums.length - 1) {
+                jump++;
+                break;
+            }
+            if (i == end) {
+                jump++;
+                end = farthest;
+            }
         }
-        if (dp[position] != 10001) {
-            return dp[position];
-        }
-        int minJump = Integer.MAX_VALUE;;
-        for (int i = 1; i <= nums[position]; i++) {
-            dp[position] = Math.min(dp[position], 1 + dfs(nums, position + i, dp));
-        }
-        return dp[position];
+        return jump;
     }
 }
