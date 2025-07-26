@@ -2,33 +2,41 @@ class Solution {
     public double[] calcEquation(List<List<String>> equations, double[] values, List<List<String>> queries) {
         Map<String, Map<String, Double>> graph = new HashMap<>();
         for (int i = 0; i < equations.size(); i++) {
-            graph.computeIfAbsent(equations.get(i).get(0), k -> new HashMap<>()).put(equations.get(i).get(1), values[i]);
-            graph.computeIfAbsent(equations.get(i).get(1), k -> new HashMap<>()).put(equations.get(i).get(0), 1.0 / values[i]);
+            String u = equations.get(i).get(0);
+            String v = equations.get(i).get(1);
+            graph.putIfAbsent(u, new HashMap<>());
+            graph.putIfAbsent(v, new HashMap<>());
+            graph.get(u).put(v, values[i]);
+            graph.get(v).put(u, 1.0 / values[i]);
         }
-        
-        double[] output = new double[queries.size()];
+        double[] result = new double[queries.size()];
         for (int i = 0; i < queries.size(); i++) {
-            String curr = queries.get(i).get(0);
-            String target = queries.get(i).get(1);
-            Set<String> visited = new HashSet<>();
-            output[i] = dfs(graph, curr, target, 1.0, visited);
-        }
-        return output;
-    }
-    public double dfs (Map<String, Map<String, Double>> graph, String curr, String target, double product, Set<String> visited) {
-        if (!graph.containsKey(curr) || !graph.containsKey(target)) {
-            return -1.0;
-        }
-        if (curr.equals(target)) {
-            return product;
-        }
-        visited.add(curr);
-        for (Map.Entry<String, Double> neighbor : graph.get(curr).entrySet()) {
-            if (!visited.contains(neighbor.getKey())) {
-                double result = dfs(graph, neighbor.getKey(), target, product * neighbor.getValue(), visited);
-                if (result != -1.0) return result;
+            if (!graph.containsKey(queries.get(i).get(0)) || !graph.containsKey(queries.get(i).get(1))) {
+                result[i] = -1.0;
+            }
+            else {
+                result[i] = helper(new HashSet<>(), graph, queries.get(i).get(0), queries.get(i).get(1));
             }
         }
-        return -1.0;
+        return result;
+
+    }
+    public double helper (Set<String> visited, Map<String, Map<String, Double>> graph, String start, String end) {
+        if (graph.get(start).containsKey(end)) {
+            return graph.get(start).get(end);
+        }
+        else {
+            visited.add(start);
+            for (Map.Entry<String, Double> neighbour : graph.get(start).entrySet()) {
+                String u = neighbour.getKey();
+                if(!visited.contains(u)) {
+                    double result = helper(visited, graph, u, end);
+                    if (result != -1.0) {
+                        return result * neighbour.getValue();
+                    }
+                }
+            }
+            return -1.0;
+        }
     }
 }
