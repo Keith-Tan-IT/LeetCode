@@ -10,28 +10,36 @@
  */
 class Solution {
     public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
-        ListNode dummyHead = new ListNode();
-        ListNode tail = dummyHead;
-        int carry = 0;
-
+        int sum = 0, carry = 0;
+        ListNode result = new ListNode();
+        ListNode dummy = result;
         while (l1 != null || l2 != null || carry != 0) {
-            int digit1 = (l1 == null) ? 0 : l1.val;
-            int digit2 = (l2 == null) ? 0 : l2.val;
-
-            int sum = digit1 + digit2 + carry;
-            int digit = sum % 10;
-            carry = sum / 10;
-
-            ListNode result = new ListNode();
-            result.val = digit;
-            tail.next = result;
-            tail = tail.next;
-
-            l1 = (l1 == null) ? null : l1.next;
-            l2 = (l2 == null) ? null : l2.next; 
+            if (l1 != null && l2 != null) {
+                sum = (l1.val + l2.val + carry) % 10;
+                carry = (l1.val + l2.val + carry) / 10;
+            }
+            else if (l1 != null) {
+                sum = (l1.val + carry) % 10;
+                carry = (l1.val + carry) / 10;
+            }
+            else if (l2 != null ) {
+                sum = (l2.val + carry) % 10;
+                carry = (l2.val + carry) / 10;
+            }
+            else {
+                sum = carry;
+                carry = 0;
+            }
+            ListNode curr = new ListNode(sum);
+            result.next = curr;
+            result = result.next;
+            if (l1 != null) {
+                l1 = l1.next;
+            }
+            if (l2 != null) {
+                l2 = l2.next;
+            }
         }
-        ListNode output = dummyHead.next;
-        dummyHead.next = null;
-        return output;
+        return dummy.next;
     }
 }
