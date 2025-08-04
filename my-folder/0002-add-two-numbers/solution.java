@@ -30,6 +30,8 @@ class Solution {
             l1 = (l1 == null) ? null : l1.next;
             l2 = (l2 == null) ? null : l2.next; 
         }
-        return dummyHead.next;
+        ListNode output = dummyHead.next;
+        dummyHead.next = null;
+        return output;
     }
 }
