@@ -19,7 +19,7 @@ class Solution {
         }
         int minutes = 0;
         int[][] directions = new int[][] {{0,1}, {0, -1}, {1, 0}, {-1, 0}};
-        while (!rotten.isEmpty()) {
+        while (!rotten.isEmpty() && freshOrange > 0) {
             minutes++;
             int size = rotten.size();
             for (int i = 0; i < size; i++) {
@@ -38,6 +38,6 @@ class Solution {
                 }
             }
         }
-        return freshOrange == 0 ? minutes - 1 : -1;
+        return freshOrange == 0 ? minutes : -1;
     }
 }
