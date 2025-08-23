@@ -41,13 +41,30 @@ def fetch_submissions(limit=20):
     while True:
         variables = {"offset": offset, "limit": limit}
         r = requests.post(graphql_url, json={"query": query, "variables": variables}, headers=headers)
-        data = r.json()
+        
+        try:
+            data = r.json()
+        except Exception:
+            print("❌ Failed to parse JSON")
+            print(r.text)
+            break
+
+        if "errors" in data:
+            print("❌ GraphQL error:", data["errors"])
+            break
+
+        if "data" not in data or "submissionList" not in data["data"]:
+            print("❌ Unexpected response:", json.dumps(data, indent=2))
+            break
+
         subs = data["data"]["submissionList"]["submissions"]
         if not subs:
             break
         submissions.extend(subs)
         offset += limit
+
     return submissions
+
 
 def save_submission(sub):
     title_slug = sub["titleSlug"]
