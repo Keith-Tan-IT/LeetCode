@@ -2,7 +2,7 @@ name: Sync All LeetCode Submissions
 
 on:
   schedule:
-    - cron: "0 0 * * *"   # run daily at midnight UTC
+    - cron: "0 0 * * *"   # daily at midnight UTC
   workflow_dispatch:
 
 permissions:
@@ -13,7 +13,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout default branch
+        uses: actions/checkout@v3
+        with:
+          ref: main
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -28,15 +31,5 @@ jobs:
         env:
           LEETCODE_SESSION: ${{ secrets.LEETCODE_SESSION }}
           LEETCODE_CSRF_TOKEN: ${{ secrets.LEETCODE_CSRF_TOKEN }}
-
-
-      - name: Commit each submission
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-
-          for file in $(git ls-files --others --exclude-standard submissions/); do
-            git add "$file"
-            git commit -m "LeetCode submission: $file"
-            git push
-          done
+          GITHUB_NAME: ${{ github.actor }}
+          GITHUB_EMAIL: ${{ github.actor }}@users.noreply.github.com
