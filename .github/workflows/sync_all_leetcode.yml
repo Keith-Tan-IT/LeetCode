@@ -30,10 +30,13 @@ jobs:
           LEETCODE_SESSION: ${{ secrets.LEETCODE_SESSION }}
           LEETCODE_CSRF_TOKEN: ${{ secrets.LEETCODE_CSRF_TOKEN }}
 
-      - name: Commit & Push
+      - name: Commit each submission
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git add submissions/
-          git commit -m "LeetCode submissions sync on $(date -u)" || echo "No changes"
-          git push
+
+          for file in $(git ls-files --others --exclude-standard submissions/); do
+            git add "$file"
+            git commit -m "LeetCode submission: $file"
+            git push
+          done
