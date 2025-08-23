@@ -1,13 +1,16 @@
 import os
 import requests
-import json
 import datetime
 from pathlib import Path
+import subprocess
+import json
 
 # --- Config ---
 LEETCODE_SESSION = os.getenv("LEETCODE_SESSION")
 LEETCODE_CSRF_TOKEN = os.getenv("LEETCODE_CSRF_TOKEN")
 OUTPUT_DIR = Path("submissions")
+
+graphql_url = "https://leetcode.com/graphql"
 
 # --- Headers for auth ---
 headers = {
@@ -17,8 +20,7 @@ headers = {
     "content-type": "application/json",
 }
 
-# --- GraphQL query to fetch submissions ---
-graphql_url = "https://leetcode.com/graphql"
+# --- GraphQL query ---
 query = """
 query submissions($offset: Int!, $limit: Int!) {
   submissionList(offset: $offset, limit: $limit) {
@@ -41,7 +43,6 @@ def fetch_submissions(limit=20):
     while True:
         variables = {"offset": offset, "limit": limit}
         r = requests.post(graphql_url, json={"query": query, "variables": variables}, headers=headers)
-        
         try:
             data = r.json()
         except Exception:
@@ -62,9 +63,19 @@ def fetch_submissions(limit=20):
             break
         submissions.extend(subs)
         offset += limit
-
     return submissions
 
+def git_commit(filepath, message, dt):
+    """Commit file with commit date set to submission timestamp."""
+    date_str = dt.strftime("%Y-%m-%d %H:%M:%S")
+    env = os.environ.copy()
+    env["GIT_AUTHOR_DATE"] = date_str
+    env["GIT_COMMITTER_DATE"] = date_str
+
+    subprocess.run(["git", "add", filepath], env=env, check=True)
+    subprocess.run(["git", "commit", "-m", message], env=env, check=True)
+    # push after each commit so it's counted in contributions
+    subprocess.run(["git", "push"], env=env, check=True)
 
 def save_submission(sub):
     title_slug = sub["titleSlug"]
@@ -88,7 +99,7 @@ def save_submission(sub):
     }
     ext = ext_map.get(lang.lower(), "txt")
 
-    # Timestamped filename
+    # Timestamp for file & commit
     dt = datetime.datetime.utcfromtimestamp(int(sub["timestamp"]))
     filename = f"{dt.strftime('%Y-%m-%d-%H%M%S')}.{ext}"
 
@@ -96,15 +107,19 @@ def save_submission(sub):
     folder.mkdir(parents=True, exist_ok=True)
 
     filepath = folder / filename
-    with open(filepath, "w", encoding="utf-8") as f:
-        f.write(code)
+    if not filepath.exists():  # avoid re-committing duplicates
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write(code)
+
+        git_commit(str(filepath), f"LeetCode submission: {title_slug}", dt)
 
 def main():
     OUTPUT_DIR.mkdir(exist_ok=True)
     submissions = fetch_submissions(limit=50)
-    print(f"Fetched {len(submissions)} submissions")
+    print(f"✅ Fetched {len(submissions)} submissions")
     for sub in submissions:
-        save_submission(sub)
+        if sub["statusDisplay"] == "Accepted":  # only save AC solutions
+            save_submission(sub)
 
 if __name__ == "__main__":
     main()
