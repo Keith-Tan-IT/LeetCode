@@ -3,7 +3,7 @@ name: Sync All LeetCode Submissions
 on:
   schedule:
     - cron: "0 0 * * *"   # run daily at midnight UTC
-  workflow_dispatch:       # allow manual trigger
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -13,15 +13,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
-      - name: Install deps
+      - name: Install dependencies
         run: pip install requests
 
       - name: Export submissions
@@ -29,6 +28,7 @@ jobs:
         env:
           LEETCODE_SESSION: ${{ secrets.LEETCODE_SESSION }}
           LEETCODE_CSRF_TOKEN: ${{ secrets.LEETCODE_CSRF_TOKEN }}
+
 
       - name: Commit each submission
         run: |
