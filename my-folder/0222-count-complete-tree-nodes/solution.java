@@ -18,6 +18,27 @@ class Solution {
         if (root == null) {
             return 0;
         }
-        return 1 + countNodes(root.left) + countNodes(root.right);
+        int leftHeight = height(root.left);
+        int rightHeight = height(root.right);
+
+        if (leftHeight == rightHeight) {
+            System.out.println(1 << leftHeight);
+            return (1 << leftHeight) + countNodes(root.right);
+        }
+        else {
+            return (1 << rightHeight) + countNodes(root.left);
+        }
+    }
+
+    public int height(TreeNode root) {
+        if(root == null) {
+            return 0;
+        }
+        int height = 0;
+        while(root != null) {
+            height += 1;
+            root = root.left;
+        }
+        return height;
     }
 }
