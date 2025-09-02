@@ -16,12 +16,23 @@
 class Solution {
     public int countNodes(TreeNode root) {
         int height = height(root);
-        return height == -1 ? 0 : height(root.right) == height - 1 ?
-        (1 << height) + countNodes(root.right) : 
-        (1 << (height - 1)) + countNodes(root.left);
+        int count = 0;
+        while(root != null) {
+            if(height - 1 == height(root.right)) {
+                count += 1 << height;
+                root = root.right; 
+            }
+            else {
+                count += 1 << height - 1;
+                root = root.left;
+            }
+            height--;
+        }
+        return count;
     }
 
     public int height(TreeNode root) {
         return root == null ? -1 : 1 + height(root.left);
     }
 }
+
