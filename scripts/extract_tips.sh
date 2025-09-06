@@ -1,32 +1,32 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Usage: ./extract_tips.sh [base_dir]
-BASE_DIR="${1:-my-folder}"   # change if your sync destination differs
+BASE_DIR="${1:-my-folder}"
 TIPS_DIR="tips"
+AGG_FILE="TIPS.md"
 
 mkdir -p "$TIPS_DIR"
 
-# Find java files and extract TIP blocks
+# Reset aggregate file
+cat > "$AGG_FILE" <<EOF
+# 📘 LeetCode Tips Cheat Sheet
+
+_All extracted automatically from solution files. Newest tips appear first._
+
+---
+EOF
+
+# Extract TIP blocks from Java files into per-problem md files
 find "$BASE_DIR" -type f -name '*.java' | while IFS= read -r file; do
-  # look for start marker "/** TIP"
   if grep -q '/\*\* *TIP' "$file"; then
-    # create a slug (path-based) e.g. my-folder/0121-best.../Solution -> 0121-best...-Solution
     rel="${file#"$BASE_DIR"/}"
     slug=$(echo "$rel" | sed 's|/|-|g' | sed 's/\.java$//')
     mdfile="$TIPS_DIR/$slug.md"
 
-    # extract block between '/** TIP' and '*/', strip the leading '*' and spaces
     tip=$(sed -n '/\/\*\* *TIP/,/\*\//p' "$file" | sed '1d;$d' | sed 's/^[[:space:]]*\* *//')
 
-    # If tip is empty (defensive), skip
-    if [ -z "$(echo "$tip" | tr -d '[:space:]')" ]; then
-      echo "No tip content for $file, skipping."
-      continue
-    fi
-
-    # write to markdown
-    cat > "$mdfile" <<EOF
+    if [ -n "$(echo "$tip" | tr -d '[:space:]')" ]; then
+      cat > "$mdfile" <<EOF
 # Tip — $slug
 
 **Source:** \`$file\`
@@ -36,18 +36,27 @@ $tip
 ---
 _Extracted: $(date -u +"%Y-%m-%dT%H:%M:%SZ")_
 EOF
-
-    git add "$mdfile" || true
-    echo "Wrote tip -> $mdfile"
+    fi
   fi
 done
 
-# If there are any changes, commit & push (GitHub Actions runner already has GITHUB_TOKEN)
-if [ -n "$(git status --porcelain)" ]; then
+# Build aggregated TIPS.md ordered by git commit date (newest first)
+git ls-files "$TIPS_DIR"/*.md | while read f; do
+  # Use last commit date for ordering
+  date=$(git log -1 --format="%at" -- "$f")
+  echo "$date|$f"
+done | sort -nr | cut -d'|' -f2 | while read f; do
+  echo "" >> "$AGG_FILE"
+  cat "$f" >> "$AGG_FILE"
+done
+
+# Stage and commit if changes
+if [ -n "$(git status --porcelain "$TIPS_DIR" "$AGG_FILE")" ]; then
+  git add "$TIPS_DIR" "$AGG_FILE"
   git config user.name "github-actions[bot]"
   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-  git commit -m "chore(tips): extract tips from Java files" || true
-  git push origin HEAD || true
+  git commit -m "chore(tips): update extracted tips and cheat sheet (newest first)"
+  git push origin HEAD
 else
   echo "No tip changes to commit."
 fi
