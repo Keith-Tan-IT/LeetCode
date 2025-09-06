@@ -35,7 +35,7 @@ find "$BASE_DIR" -type f -name "*.java" | while read -r file; do
         PROBLEM_FOLDER=$(dirname "$file")
         TIP_FILE="$PROBLEM_FOLDER/TIP.md"
 
-        # Write per-problem TIP.md
+        # Write per-problem TIP.md inside problem folder
         echo -e "# Tip — $problem_number. $problem_title\n\n$tip_block" > "$TIP_FILE"
         echo "Wrote per-problem TIP: $TIP_FILE"
     done
@@ -51,5 +51,5 @@ find "$BASE_DIR" -type f -name "TIP.md" | sort -r | while read -r f; do
     echo -e "\n\n---\n\n" >> "$AGG_FILE"
 done
 
-echo "TIPS.md generated successfully at $AGG_FILE"
+echo "Aggregated TIPS.md generated successfully at: $AGG_FILE"
 exit 0
