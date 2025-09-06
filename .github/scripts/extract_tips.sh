@@ -57,8 +57,10 @@ if [ -n "$(git status --porcelain "$TIPS_DIR" "$AGG_FILE")" ]; then
   git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
   git commit -m "chore(tips): update extracted tips and cheat sheet (newest first)"
 
-  # Avoid push rejection by rebasing on latest main
-  git pull --rebase origin main
+  # Rebase onto remote without messing with unstaged files
+  git fetch origin main
+  git rebase origin/main
+
   git push origin HEAD:main
 else
   echo "No tip changes to commit."
