@@ -8,9 +8,13 @@ if [ -z "$LEETCODE_FOLDER" ]; then
 fi
 
 AGG_FILE="$LEETCODE_FOLDER/TIPS.md"
-echo "# 📘 LeetCode Tips Cheat Sheet" > "$AGG_FILE"
-echo "_Newest tips first_" >> "$AGG_FILE"
-echo "" >> "$AGG_FILE"
+
+# Initialize aggregated file if it doesn't exist
+if [ ! -f "$AGG_FILE" ]; then
+    echo "# 📘 LeetCode Tips Cheat Sheet" > "$AGG_FILE"
+    echo "_Newest tips first_" >> "$AGG_FILE"
+    echo "" >> "$AGG_FILE"
+fi
 
 for folder in "$LEETCODE_FOLDER"/*/; do
     SOLUTION="$folder/solution.java"
@@ -48,11 +52,16 @@ for folder in "$LEETCODE_FOLDER"/*/; do
     echo "$TIP_BLOCK" >> "$TIP_FILE"
     echo "Wrote per-problem TIP: $TIP_FILE"
 
-    # Append to aggregated TIPS.md
-    echo "---" >> "$AGG_FILE"
-    echo "# Tip — $PROBLEM_LINE" >> "$AGG_FILE"
-    echo "$TIP_BLOCK" >> "$AGG_FILE"
-    echo "" >> "$AGG_FILE"
+    # Prepend to aggregated TIPS.md (newest first)
+    TMP_AGG=$(mktemp)
+    {
+      echo "---"
+      echo "# Tip — $PROBLEM_LINE"
+      echo "$TIP_BLOCK"
+      echo ""
+    } > "$TMP_AGG"
+    cat "$AGG_FILE" >> "$TMP_AGG"
+    mv "$TMP_AGG" "$AGG_FILE"
 
 done
 
