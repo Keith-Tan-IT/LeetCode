@@ -1,0 +1,33 @@
+name: Sync LeetCode + Extract Tips
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 8 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sync (leetcode-sync)
+        uses: joshcai/leetcode-sync@v1.7
+        with:
+          github-token: ${{ github.token }}
+          leetcode-csrf-token: ${{ secrets.LEETCODE_CSRF_TOKEN }}
+          leetcode-session: ${{ secrets.LEETCODE_SESSION }}
+          destination-folder: my-folder
+          verbose: true
+          commit-header: "[LeetCode Sync]"
+
+      - name: Extract tips + build cheat sheet
+        run: |
+          chmod +x .github/scripts/extract_tips.sh
+          .github/scripts/extract_tips.sh my-folder
