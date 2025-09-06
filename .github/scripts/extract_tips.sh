@@ -24,11 +24,18 @@ find "$BASE_DIR" -type f -name "*.java" | while read -r file; do
         if [[ -z "$tip_block" ]]; then
             continue
         fi
+        
+        # Extract problem number and title robustly
+        problem_line=$(echo "$tip_block" | grep -i "Problem:" || true)
+        if [[ -n "$problem_line" ]]; then
+            # Example: " * Problem: 872. Leaf-Similar Trees"
+            problem_number=$(echo "$problem_line" | grep -oP 'Problem:\s*\K[0-9]+')
+            problem_title=$(echo "$problem_line" | grep -oP 'Problem:\s*[0-9]+\.\s*\K.*')
+        else
+            problem_number="Unknown"
+            problem_title="Unknown"
+        fi
 
-        # Get problem number and title
-        problem_line=$(echo "$tip_block" | grep -i "Problem:" || true | head -1)
-        problem_number=$(echo "$problem_line" | cut -d'.' -f1 | grep -o '[0-9]*')
-        problem_title=$(echo "$problem_line" | cut -d'.' -f2- | sed 's/^ *//')
 
         # Generate slug for file/folder name
         slug=$(echo "$problem_title" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-')
