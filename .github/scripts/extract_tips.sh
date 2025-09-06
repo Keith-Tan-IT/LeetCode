@@ -51,19 +51,23 @@ for folder in "$LEETCODE_FOLDER"/*/; do
     echo "# Tip — $PROBLEM_LINE" > "$TIP_FILE"
     echo "$TIP_BLOCK" >> "$TIP_FILE"
     echo "Wrote per-problem TIP: $TIP_FILE"
-        
-    # Prepend to aggregated TIPS.md (newest first) only if not already present
-    if ! grep -q "Tip — $PROBLEM_LINE" "$AGG_FILE"; then
-        TMP_AGG=$(mktemp)
-        {
-          echo "---"
-          echo "# Tip — $PROBLEM_LINE"
-          echo "$TIP_BLOCK"
-          echo ""
-        } > "$TMP_AGG"
-        cat "$AGG_FILE" >> "$TMP_AGG"
-        mv "$TMP_AGG" "$AGG_FILE"
-    fi
+
+    # Prepend to aggregated TIPS.md (newest first), keeping header at top
+    TMP_AGG=$(mktemp)
+    {
+        # Print header
+        head -n 2 "$AGG_FILE"
+
+        # Add new tip
+        echo "---"
+        echo "# Tip — $PROBLEM_LINE"
+        echo "$TIP_BLOCK"
+        echo ""
+
+        # Append existing tips, skipping the header
+        tail -n +3 "$AGG_FILE"
+    } > "$TMP_AGG"
+    mv "$TMP_AGG" "$AGG_FILE"
 
 done
 
