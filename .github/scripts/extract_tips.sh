@@ -21,7 +21,7 @@ for folder in "$LEETCODE_FOLDER"/*/; do
     fi
 
     # Extract all /** ... */ blocks containing TIP
-    TIP_BLOCKS=$(awk '
+    awk '
         BEGIN {inblock=0; tip_found=0; buf=""}
         /^\s*\/\*\*/ {inblock=1; tip_found=0; buf=""}
         inblock {
@@ -29,17 +29,10 @@ for folder in "$LEETCODE_FOLDER"/*/; do
             if ($0 ~ /TIP/) tip_found=1
         }
         /^\s*\*\// {
-            if (inblock && tip_found) print buf
+            if (inblock && tip_found) print buf "\0"
             inblock=0; buf=""
         }
-    ' "$SOLUTION_FILE")
-
-    if [ -z "$TIP_BLOCKS" ]; then
-        continue
-    fi
-
-    # Loop over each TIP block found
-    echo "$TIP_BLOCKS" | awk 'BEGIN{RS="\n\n"; ORS="\n\n"} {print $0}' | while read -r TIP_BLOCK; do
+    ' "$SOLUTION_FILE" | while IFS= read -r -d '' TIP_BLOCK; do
 
         # Extract Problem number and title
         PROBLEM_LINE=$(echo "$TIP_BLOCK" | grep -i 'Problem:' | sed -E 's/^[[:space:]]*\*+[[:space:]]*Problem:[[:space:]]*(.*)/\1/')
