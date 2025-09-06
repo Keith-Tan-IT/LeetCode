@@ -20,41 +20,46 @@ for folder in "$LEETCODE_FOLDER"/*/; do
         continue
     fi
 
-    # Capture full TIP block
-    TIP_BLOCK=$(awk '
-        BEGIN {in_block=0; tip_found=0; buf=""}
-        /^\s*\/\*\*/ { in_block=1; buf=""; tip_found=0 }
-        in_block {
+    # Extract all /** ... */ blocks containing TIP
+    TIP_BLOCKS=$(awk '
+        BEGIN {inblock=0; tip_found=0; buf=""}
+        /^\s*\/\*\*/ {inblock=1; tip_found=0; buf=""}
+        inblock {
             buf = buf $0 "\n"
             if ($0 ~ /TIP/) tip_found=1
         }
         /^\s*\*\// {
-            if (in_block && tip_found) print buf
-            in_block=0; buf=""
+            if (inblock && tip_found) print buf
+            inblock=0; buf=""
         }
     ' "$SOLUTION_FILE")
 
-    if [ -z "$TIP_BLOCK" ]; then
+    if [ -z "$TIP_BLOCKS" ]; then
         continue
     fi
 
-    # Extract Problem number and title robustly
-    PROBLEM_LINE=$(echo "$TIP_BLOCK" | grep -i 'Problem:' | sed -E 's/^[[:space:]]*\*+[[:space:]]*Problem:[[:space:]]*(.*)/\1/')
-    if [ -z "$PROBLEM_LINE" ]; then
-        PROBLEM_LINE="Unknown. Unknown"
-    fi
+    # Loop over each TIP block found
+    echo "$TIP_BLOCKS" | awk 'BEGIN{RS="\n\n"; ORS="\n\n"} {print $0}' | while read -r TIP_BLOCK; do
 
-    # Write per-problem TIP.md
-    TIP_FILE="$folder/TIP.md"
-    echo "# $PROBLEM_LINE" > "$TIP_FILE"
-    echo "$TIP_BLOCK" >> "$TIP_FILE"
-    echo "Wrote per-problem TIP: $TIP_FILE"
+        # Extract Problem number and title
+        PROBLEM_LINE=$(echo "$TIP_BLOCK" | grep -i 'Problem:' | sed -E 's/^[[:space:]]*\*+[[:space:]]*Problem:[[:space:]]*(.*)/\1/')
+        if [ -z "$PROBLEM_LINE" ]; then
+            PROBLEM_LINE="Unknown. Unknown"
+        fi
 
-    # Append to aggregated TIPS.md
-    echo "---" >> "$AGG_FILE"
-    echo "## $PROBLEM_LINE" >> "$AGG_FILE"
-    echo "$TIP_BLOCK" >> "$AGG_FILE"
-    echo "" >> "$AGG_FILE"
+        # Write per-problem TIP.md
+        TIP_FILE="$folder/TIP.md"
+        echo "# $PROBLEM_LINE" > "$TIP_FILE"
+        echo "$TIP_BLOCK" >> "$TIP_FILE"
+        echo "Wrote per-problem TIP: $TIP_FILE"
+
+        # Append to aggregated TIPS.md
+        echo "---" >> "$AGG_FILE"
+        echo "## $PROBLEM_LINE" >> "$AGG_FILE"
+        echo "$TIP_BLOCK" >> "$AGG_FILE"
+        echo "" >> "$AGG_FILE"
+
+    done
 done
 
 echo "Aggregated TIPS.md generated successfully at: $AGG_FILE"
