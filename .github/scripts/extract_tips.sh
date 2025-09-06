@@ -1,71 +1,67 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/bash
+set -e
 
-# Directory containing LeetCode problem folders
-BASE_DIR="${1:-my-folder}"
-AGG_FILE="$BASE_DIR/TIPS.md"
+BASE_DIR="$1"
+
+if [ -z "$BASE_DIR" ]; then
+    echo "Usage: $0 <path-to-synced-leetcode-folder>"
+    exit 1
+fi
 
 echo "Starting tip extraction from: $BASE_DIR"
 
-# Ensure tips folder exists (optional)
+# Create tips folder if not exists
 mkdir -p "$BASE_DIR/tips"
 
-# Temporary array to avoid duplicates
-declare -A processed_files
+# Initialize aggregated file
+AGG_FILE="$BASE_DIR/TIPS.md"
+echo "# LeetCode Tips Cheat Sheet" > "$AGG_FILE"
+echo "Newest tips first" >> "$AGG_FILE"
+echo "" >> "$AGG_FILE"
 
-# Loop through all Java files
-find "$BASE_DIR" -type f -name "*.java" | while read -r file; do
-    # Extract TIP comment blocks only
-    awk '
-    BEGIN {in_comment=0; in_tip=0; buf=""}
-    /\/\*\*/ {in_comment=1; buf=""}
-    in_comment {buf=buf $0 "\n"}
-    /TIP/ && in_comment {in_tip=1; tip_text=buf}
+# Iterate over each problem folder
+for folder in "$BASE_DIR"/*/; do
+    SOLUTION_FILE="$folder/solution.java"
+    if [ ! -f "$SOLUTION_FILE" ]; then
+        continue
+    fi
+
+    # Extract TIP block (multi-line)
+    TIP_BLOCK=$(awk '
+    BEGIN {in_comment=0; tip_found=0; buf=""}
+    /\/\*\*/ {in_comment=1; buf=""; tip_found=0}
     /\*\// {
-        if(in_tip){
-            print tip_text
-            in_tip=0
-        }
+        if(tip_found) print buf
         in_comment=0
+        buf=""
     }
-    ' "$file" | while IFS= read -r tip_block || [ -n "$tip_block" ]; do
-        # Skip empty blocks
-        [[ -z "$tip_block" ]] && continue
+    in_comment {
+        buf = buf $0 "\n"
+        if($0 ~ /TIP/) tip_found=1
+    }' "$SOLUTION_FILE")
 
-        # Extract problem number and title robustly
-        problem_line=$(echo "$tip_block" | grep -i "Problem:" || true)
-        if [[ -n "$problem_line" ]]; then
-            problem_number=$(echo "$problem_line" | grep -oP 'Problem:\s*\K[0-9]+')
-            problem_title=$(echo "$problem_line" | grep -oP 'Problem:\s*[0-9]+\.\s*\K.*')
-        else
-            problem_number="Unknown"
-            problem_title="Unknown"
-        fi
+    # Skip if no TIP found
+    if [ -z "$TIP_BLOCK" ]; then
+        continue
+    fi
 
-        # Skip duplicate per file
-        PROBLEM_FOLDER=$(dirname "$file")
-        TIP_FILE="$PROBLEM_FOLDER/TIP.md"
-        if [[ -n "${processed_files[$TIP_FILE]:-}" ]]; then
-            continue
-        fi
-        processed_files["$TIP_FILE"]=1
+    # Get problem number and title from TIP
+    PROBLEM_LINE=$(echo "$TIP_BLOCK" | grep -Eo "Problem: [0-9]+\. .*")
+    if [ -z "$PROBLEM_LINE" ]; then
+        PROBLEM_LINE="Problem unknown"
+    fi
+    SLUG=$(echo "$folder" | sed 's#.*/##; s#/$##')  # folder name
 
-        # Write per-problem TIP.md safely
-        printf "# Tip — %s. %s\n\n%s\n" "$problem_number" "$problem_title" "$tip_block" > "$TIP_FILE"
-        echo "Wrote per-problem TIP: $TIP_FILE"
-    done
-done
+    # Write per-problem TIP.md
+    TIP_FILE="$folder/TIP.md"
+    echo "# $PROBLEM_LINE" > "$TIP_FILE"
+    echo "$TIP_BLOCK" >> "$TIP_FILE"
+    echo "Wrote per-problem TIP: $TIP_FILE"
 
-# Build aggregated TIPS.md, newest first
-echo "# 📘 LeetCode Tips Cheat Sheet" > "$AGG_FILE"
-echo "_Newest tips first_" >> "$AGG_FILE"
-echo -e "\n---\n" >> "$AGG_FILE"
-
-# Append all per-problem TIP.md files in reverse order (newest first)
-find "$BASE_DIR" -type f -name "TIP.md" | sort -r | while read -r f; do
-    cat "$f" >> "$AGG_FILE"
-    echo -e "\n\n---\n\n" >> "$AGG_FILE"
+    # Append to aggregated TIPS.md (newest first)
+    echo "## $PROBLEM_LINE" >> "$AGG_FILE"
+    echo "$TIP_BLOCK" >> "$AGG_FILE"
+    echo "" >> "$AGG_FILE"
 done
 
 echo "Aggregated TIPS.md generated successfully at: $AGG_FILE"
-exit 0
