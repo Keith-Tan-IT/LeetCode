@@ -3,7 +3,7 @@ name: Sync LeetCode + Extract Tips
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 8 * * *"  # Every day at 8am UTC
+    - cron: "0 8 * * *"  # Daily at 08:00 UTC
 
 permissions:
   contents: write
@@ -34,20 +34,21 @@ jobs:
       - name: Extract tips + build cheat sheet
         run: |
           chmod +x .github/scripts/extract_tips.sh
-          # Extract tips: TIP.md overwritten only if changed
-          # TIPS.md always updated if any TIP.md changed
           .github/scripts/extract_tips.sh my-folder
 
-      # 4️⃣ Commit & push any updated TIP.md / TIPS.md
+      # 4️⃣ Commit & push TIP updates
       - name: Commit TIP updates
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          # Stage any updated TIP.md or TIPS.md
+          
+          # Stage updated TIP.md or TIPS.md
           git add my-folder/*/TIP.md my-folder/TIPS.md
+
           # Only commit if there are changes
           if ! git diff --cached --quiet; then
             git commit -m "chore(tips): update TIPs after LeetCode sync"
             git push origin main
           else
             echo "No TIP updates to commit."
+          fi
