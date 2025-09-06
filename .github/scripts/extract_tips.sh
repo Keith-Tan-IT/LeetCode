@@ -10,6 +10,9 @@ echo "Starting tip extraction from: $BASE_DIR"
 # Ensure tips folder exists (optional)
 mkdir -p "$BASE_DIR/tips"
 
+# Temporary array to avoid duplicates
+declare -A processed_files
+
 # Loop through all Java files
 find "$BASE_DIR" -type f -name "*.java" | while read -r file; do
     # Extract TIP comment blocks only
@@ -39,16 +42,30 @@ find "$BASE_DIR" -type f -name "*.java" | while read -r file; do
             problem_title="Unknown"
         fi
 
-        # Slug for file/folder name
-        slug=$(echo "$problem_title" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-')
+        # Skip duplicate per file
         PROBLEM_FOLDER=$(dirname "$file")
         TIP_FILE="$PROBLEM_FOLDER/TIP.md"
+        if [[ -n "${processed_files[$TIP_FILE]:-}" ]]; then
+            continue
+        fi
+        processed_files["$TIP_FILE"]=1
 
-        # Write per-problem TIP.md
-        echo -e "# Tip — $problem_number. $problem_title\n\n$tip_block" > "$TIP_FILE"
+        # Write per-problem TIP.md safely
+        printf "# Tip — %s. %s\n\n%s\n" "$problem_number" "$problem_title" "$tip_block" > "$TIP_FILE"
         echo "Wrote per-problem TIP: $TIP_FILE"
     done
 done
 
 # Build aggregated TIPS.md, newest first
-echo "# 📘 LeetCode Tips Cheat Sheet" > "$A
+echo "# 📘 LeetCode Tips Cheat Sheet" > "$AGG_FILE"
+echo "_Newest tips first_" >> "$AGG_FILE"
+echo -e "\n---\n" >> "$AGG_FILE"
+
+# Append all per-problem TIP.md files in reverse order (newest first)
+find "$BASE_DIR" -type f -name "TIP.md" | sort -r | while read -r f; do
+    cat "$f" >> "$AGG_FILE"
+    echo -e "\n\n---\n\n" >> "$AGG_FILE"
+done
+
+echo "Aggregated TIPS.md generated successfully at: $AGG_FILE"
+exit 0
