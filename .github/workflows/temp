@@ -1,0 +1,22 @@
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Make extractor executable
+        run: chmod +x .github/scripts/extract_tips.sh
+
+      - name: Run extractor
+        run: .github/scripts/extract_tips.sh my-folder
+
+      - name: Commit & Push tips
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tips TIPS.md
+          git commit -m "chore(tips): update all extracted tips" || echo "No changes"
+          git push
