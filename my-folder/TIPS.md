@@ -2,6 +2,68 @@
 _Newest tips first_
 
 ---
+# Tip — Unknown. Unknown
+/**
+ * TIP
+ * Problem context: Graph traversal problems using adjacency matrices or lists
+ *
+ * Summary:
+ * - `int[][] isConnected` → 2D array; use `isConnected.length` to get number of rows.
+ * - `List<List<Integer>> rooms` → list of lists; use `rooms.size()` to get number of rooms.
+ * - For 1D array: `int[] array` → `array.length` gives size.
+ * - For a list: `List<Integer> list` → `list.size()` gives number of elements.
+ *
+ * Pitfalls:
+ * - `.length` for arrays, `.size()` for lists — don't confuse them.
+ * - Accessing out-of-bound indices will throw exceptions.
+ * - Initializing 2D arrays vs list-of-lists differs:
+ *   - `new int[n][m]` → rows and columns fixed
+ *   - `List<List<Integer>> rooms = new ArrayList<>()` → flexible size, must init inner lists
+ *
+ * Example:
+ * int[][] isConnected = {{1,1,0},{1,1,0},{0,0,1}};
+ * System.out.println(isConnected.length); // 3
+ * List<List<Integer>> rooms = new ArrayList<>();
+ * rooms.add(Arrays.asList(1,0));
+ * System.out.println(rooms.size()); // 1
+ *
+ * Key points:
+ * - Arrays: fixed size, use `.length`.
+ * - Lists: dynamic size, use `.size()`.
+ * - Common in graph problems: adjacency matrix (`isConnected`) or adjacency list (`rooms`).
+ */
+
+
+---
+# Tip — Understanding 1 << k (Bitwise Left Shift)
+/**
+ * TIP
+ * Problem: Understanding 1 << k (Bitwise Left Shift)
+ *
+ * Summary:
+ * - `<<` is the bitwise left shift operator in Java.
+ * - `1 << k` shifts the number 1 left by `k` bits, which is equivalent to 2^k.
+ * - This is often used in problems involving powers of 2, complete binary trees, or bitmasking.
+ *
+ * Example:
+ * 1 << 3 = 8   // 1000 in binary
+ * 1 << 4 = 16  // 10000 in binary
+ *
+ * Usage in LeetCode:
+ * - Common in problems like "Count Complete Tree Nodes" where you calculate nodes in a full binary subtree:
+ *   int nodes = 1 << leftHeight;  // computes number of nodes in a perfect binary subtree
+ *
+ * Pitfall:
+ * - Remember operator precedence: `(1 << k)` is safe, avoid writing `1 << k + 1` without parentheses.
+ * - `<<` only works with integer types; results may overflow if k is too large.
+ *
+ * Key points:
+ * - Efficient way to compute powers of 2.
+ * - Often used in combination with recursion or tree traversal to calculate counts.
+ */
+
+
+---
 # Tip — 1071. Greatest Common Divisor of Strings
 /**
  * TIP
