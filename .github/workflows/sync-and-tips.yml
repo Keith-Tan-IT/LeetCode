@@ -30,6 +30,12 @@ jobs:
           verbose: true
           commit-header: "[LeetCode Sync]"
 
+      # ✅ Refresh repo to include commit made by leetcode-sync
+      - name: Refresh repo after sync
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+
       # 3️⃣ Extract TIPs and build cheat sheet
       - name: Extract tips + build cheat sheet
         run: |
