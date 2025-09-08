@@ -18,29 +18,10 @@ class Solution {
         if (root == null) {
             return false;
         }
-        Stack<Integer> sum = new Stack<>();
-        Stack<TreeNode> tree = new Stack<>();
-        tree.push(root);
-        sum.push(root.val);
-        while (!tree.empty()) {
-            TreeNode node = tree.pop();
-            int currentSum = sum.pop();
-            if (node.left == null && node.right == null) {
-                if (currentSum == targetSum) {
-                    return true;
-                }
-            }
-            else {
-                if (node.left != null) {
-                    tree.push(node.left);
-                    sum.push(node.left.val + currentSum);
-                }
-                if (node.right != null) {
-                    tree.push(node.right);
-                    sum.push(node.right.val + currentSum);
-                }
-            }
+        if (root.left == null && root.right == null && targetSum == root.val) {
+            return true;
         }
-        return false;
+        return hasPathSum(root.left, targetSum - root.val) ||
+                hasPathSum(root.right, targetSum - root.val);
     }
 }
