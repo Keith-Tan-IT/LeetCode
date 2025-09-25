@@ -154,6 +154,6 @@ class Solution {
                 result.add(interval);
             }
         }
-        return result.toArray(new int [0][]);
+        return result.toArray(new int [result.size()][]);
     }
 }
