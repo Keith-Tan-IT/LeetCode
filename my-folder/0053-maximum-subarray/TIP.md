@@ -1,4 +1,5 @@
-# Tip — Unknown. Unknown
+# Tip —  * Problem context: LeetCode 53 — Maximum Subarray
+
 /**
  * TIP
  * Problem context: LeetCode 53 — Maximum Subarray
@@ -38,3 +39,4 @@
  *   - 2D max subarray → apply Kadane row-wise.
  *   - Circular max subarray (LeetCode 918).
  */
+

@@ -1,4 +1,5 @@
 # Tip — Understanding 1 << k (Bitwise Left Shift)
+
 /**
  * TIP
  * Problem: Understanding 1 << k (Bitwise Left Shift)
@@ -24,3 +25,4 @@
  * - Efficient way to compute powers of 2.
  * - Often used in combination with recursion or tree traversal to calculate counts.
  */
+

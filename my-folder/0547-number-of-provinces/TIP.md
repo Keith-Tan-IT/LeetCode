@@ -1,4 +1,5 @@
-# Tip — Unknown. Unknown
+# Tip —  * Problem context: Graph traversal problems using adjacency matrices or lists
+
 /**
  * TIP
  * Problem context: Graph traversal problems using adjacency matrices or lists
@@ -28,3 +29,4 @@
  * - Lists: dynamic size, use `.size()`.
  * - Common in graph problems: adjacency matrix (`isConnected`) or adjacency list (`rooms`).
  */
+

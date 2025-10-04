@@ -1,4 +1,5 @@
-# Tip — Unknown. Unknown
+# Tip —  * Problem context: LeetCode 15 — 3Sum
+
 /**
  * TIP
  * Problem context: LeetCode 15 — 3Sum
@@ -44,3 +45,4 @@
  * - Must skip duplicates at 3 places: i, left, right.
  * - Build triplets with `Arrays.asList()`, `List.of()`, or manual new ArrayList.
  */
+

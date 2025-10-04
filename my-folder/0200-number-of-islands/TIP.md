@@ -1,4 +1,5 @@
-# Tip — Unknown. Unknown
+# Tip —  * Problem context: LeetCode 200 — Number of Islands
+
 /**
  * TIP
  * Problem context: LeetCode 200 — Number of Islands
@@ -53,3 +54,4 @@
  * - Time: O(m * n) — each cell visited once.
  * - Space: O(min(m, n)) — for BFS queue (or recursion depth).
  */
+

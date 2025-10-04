@@ -1,4 +1,5 @@
-# Tip — Unknown. Unknown
+# Tip —  * Problem context: LeetCode 57 — Insert Interval
+
 /**
  * TIP
  * Problem context: LeetCode 57 — Insert Interval
@@ -42,3 +43,4 @@
  * - Return `result.toArray(new int[0][])` for conversion.
  * - Time: O(n) (linear scan), Space: O(n) for output.
  */
+

@@ -1,4 +1,5 @@
 # Tip — 1071. Greatest Common Divisor of Strings
+
 /**
  * TIP
  * Problem: 1071. Greatest Common Divisor of Strings
@@ -28,3 +29,4 @@
  * Pitfall:
  * Never use `==` for string value comparisons in Java; always use `.equals()`.
  */
+

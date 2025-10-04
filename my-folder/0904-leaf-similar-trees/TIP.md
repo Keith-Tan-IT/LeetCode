@@ -1,4 +1,5 @@
 # Tip — 872. Leaf-Similar Trees
+
 /**
  * TIP
  * Problem: 872. Leaf-Similar Trees
@@ -17,3 +18,4 @@
  * Pitfall:
  * If you `new Integer(200)` references differ too. Avoid relying on interning.
  */
+

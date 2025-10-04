@@ -1,4 +1,5 @@
-# Tip — Unknown. Unknown
+# Tip —  * Problem context: LeetCode 989 — Add to Array-Form of Integer
+
 /**
  * TIP
  * Problem context: LeetCode 989 — Add to Array-Form of Integer
@@ -36,3 +37,4 @@
  * - Use `LinkedList.addFirst()` for efficient front insertions.
  * - For `ArrayList`, append and reverse at the end.
  */
+
