@@ -1,20 +1,15 @@
 class Solution {
     public int arithmeticTriplets(int[] nums, int diff) {
-        int counter = 0;
-        for (int i = 0; i < nums.length; i++) {
-            if (contains(nums, nums[i] + diff) && contains(nums, nums[i] + 2 * diff)) {
-                counter++;
-            }
-        }
-        return counter;
-    }
-
-    public boolean contains(int[] nums, int target) {
+        Map <Integer, Integer> hashMap = new HashMap<>();
+        int count = 0, i = 0;
         for (int num : nums) {
-            if (num == target) {
-                return true;
+            hashMap.put(num, i++);
+        }
+        for (int num : nums) {
+            if (hashMap.containsKey(num + diff) && hashMap.containsKey(num + 2 * diff)) {
+                count++;
             }
         }
-        return false;
+        return count;
     }
 }
