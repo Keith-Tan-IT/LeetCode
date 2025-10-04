@@ -2,68 +2,6 @@
 _Newest tips first_
 
 ---
-# Tip — Unknown. Unknown
-/**
- * TIP
- * Problem context: Graph traversal problems using adjacency matrices or lists
- *
- * Summary:
- * - `int[][] isConnected` → 2D array; use `isConnected.length` to get number of rows.
- * - `List<List<Integer>> rooms` → list of lists; use `rooms.size()` to get number of rooms.
- * - For 1D array: `int[] array` → `array.length` gives size.
- * - For a list: `List<Integer> list` → `list.size()` gives number of elements.
- *
- * Pitfalls:
- * - `.length` for arrays, `.size()` for lists — don't confuse them.
- * - Accessing out-of-bound indices will throw exceptions.
- * - Initializing 2D arrays vs list-of-lists differs:
- *   - `new int[n][m]` → rows and columns fixed
- *   - `List<List<Integer>> rooms = new ArrayList<>()` → flexible size, must init inner lists
- *
- * Example:
- * int[][] isConnected = {{1,1,0},{1,1,0},{0,0,1}};
- * System.out.println(isConnected.length); // 3
- * List<List<Integer>> rooms = new ArrayList<>();
- * rooms.add(Arrays.asList(1,0));
- * System.out.println(rooms.size()); // 1
- *
- * Key points:
- * - Arrays: fixed size, use `.length`.
- * - Lists: dynamic size, use `.size()`.
- * - Common in graph problems: adjacency matrix (`isConnected`) or adjacency list (`rooms`).
- */
-
-
----
-# Tip — Understanding 1 << k (Bitwise Left Shift)
-/**
- * TIP
- * Problem: Understanding 1 << k (Bitwise Left Shift)
- *
- * Summary:
- * - `<<` is the bitwise left shift operator in Java.
- * - `1 << k` shifts the number 1 left by `k` bits, which is equivalent to 2^k.
- * - This is often used in problems involving powers of 2, complete binary trees, or bitmasking.
- *
- * Example:
- * 1 << 3 = 8   // 1000 in binary
- * 1 << 4 = 16  // 10000 in binary
- *
- * Usage in LeetCode:
- * - Common in problems like "Count Complete Tree Nodes" where you calculate nodes in a full binary subtree:
- *   int nodes = 1 << leftHeight;  // computes number of nodes in a perfect binary subtree
- *
- * Pitfall:
- * - Remember operator precedence: `(1 << k)` is safe, avoid writing `1 << k + 1` without parentheses.
- * - `<<` only works with integer types; results may overflow if k is too large.
- *
- * Key points:
- * - Efficient way to compute powers of 2.
- * - Often used in combination with recursion or tree traversal to calculate counts.
- */
-
-
----
 # Tip — 1071. Greatest Common Divisor of Strings
 /**
  * TIP
@@ -93,6 +31,47 @@ _Newest tips first_
  *
  * Pitfall:
  * Never use `==` for string value comparisons in Java; always use `.equals()`.
+ */
+
+
+---
+# Tip — Unknown. Unknown
+/**
+ * TIP
+ * Problem context: LeetCode 989 — Add to Array-Form of Integer
+ *
+ * Summary:
+ * - You need to add an integer `k` to an array-form number `num[]`.
+ * - Iterate from the end (least significant digit) and propagate the carry (`k`).
+ * - Insert each new digit into the result from the front, or build in reverse and flip later.
+ *
+ * Implementation Variants:
+ *
+ * | Method                         | Insert at Front          | Build `n`-size Result | Space |
+ * | ------------------------------ | ------------------------ | --------------------- | ----- |
+ * | `ArrayList.add(0, …)`          | O(n) each                | O(n²) total ❌         | O(n)  |
+ * | `LinkedList.addFirst(…)`       | O(1) each                | O(n) total ✅          | O(n)  |
+ * | `ArrayList.add(…) + reverse()` | O(1) each + O(n) reverse | O(n) total ✅          | O(n)  |
+ * | `LinkedList.add(0, …)`         | O(1) each                | O(n) total ✅          | O(n)  |
+ *
+ * Pitfalls:
+ * - `ArrayList.add(0, …)` looks simple but is O(n²) because shifting elements costs O(n).
+ * - For competitive coding, prefer:
+ *   - `LinkedList.addFirst()` (direct front insertion), or
+ *   - Append with `ArrayList.add()` then `Collections.reverse()` once.
+ * - Make sure to continue processing while `k > 0` after finishing array traversal.
+ *
+ * Example:
+ * num = [2,7,4], k = 181
+ *  4 + 181 = 185 → digit=5, carry=18
+ *  7 + 18 = 25 → digit=5, carry=2
+ *  2 + 2 = 4 → digit=4, carry=0
+ *  Result = [4,5,5]
+ *
+ * Key points:
+ * - Always handle leftover carry after loop.
+ * - Use `LinkedList.addFirst()` for efficient front insertions.
+ * - For `ArrayList`, append and reverse at the end.
  */
 
 
@@ -148,3 +127,33 @@ _Newest tips first_
  */
 
 
+---
+# Tip — Understanding 1 << k (Bitwise Left Shift)
+/**
+ * TIP
+ * Problem: Understanding 1 << k (Bitwise Left Shift)
+ *
+ * Summary:
+ * - `<<` is the bitwise left shift operator in Java.
+ * - `1 << k` shifts the number 1 left by `k` bits, which is equivalent to 2^k.
+ * - This is often used in problems involving powers of 2, complete binary trees, or bitmasking.
+ *
+ * Example:
+ * 1 << 3 = 8   // 1000 in binary
+ * 1 << 4 = 16  // 10000 in binary
+ *
+ * Usage in LeetCode:
+ * - Common in problems like "Count Complete Tree Nodes" where you calculate nodes in a full binary subtree:
+ *   int nodes = 1 << leftHeight;  // computes number of nodes in a perfect binary subtree
+ *
+ * Pitfall:
+ * - Remember operator precedence: `(1 << k)` is safe, avoid writing `1 << k + 1` without parentheses.
+ * - `<<` only works with integer types; results may overflow if k is too large.
+ *
+ * Key points:
+ * - Efficient way to compute powers of 2.
+ * - Often used in combination with recursion or tree traversal to calculate counts.
+ */
+
+
+---
