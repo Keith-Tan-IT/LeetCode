@@ -11,6 +11,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       # 1️⃣ Checkout repo (full history for commits)
       - name: Checkout repo
@@ -30,31 +31,25 @@ jobs:
           verbose: true
           commit-header: "[LeetCode Sync]"
 
-      # ✅ Refresh repo to include commit made by leetcode-sync
-      - name: Refresh repo after sync
-        run: |
-          git fetch origin main
-          git reset --hard origin/main
-
-      # 3️⃣ Extract TIPs and build cheat sheet
+      # ✅ 3️⃣ Extract tips + build cheat sheet (safe overwrite)
       - name: Extract tips + build cheat sheet
         run: |
           chmod +x .github/scripts/extract_tips.sh
           .github/scripts/extract_tips.sh my-folder
 
-      # 4️⃣ Commit & push TIP updates
+      # ✅ 4️⃣ Commit only if TIPs changed
       - name: Commit TIP updates
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # Stage updated TIP.md or TIPS.md
+
+          # Stage modified/new TIPs
           git add my-folder/*/TIP.md my-folder/TIPS.md
 
-          # Only commit if there are changes
+          # Commit only if there's a difference
           if ! git diff --cached --quiet; then
-            git commit -m "chore(tips): update TIPs after LeetCode sync"
+            git commit -m "chore(tips): sync updated TIPs"
             git push origin main
           else
-            echo "No TIP updates to commit."
+            echo "No new or updated TIPs found."
           fi
