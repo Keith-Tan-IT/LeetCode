@@ -67,21 +67,19 @@
 
 class Solution {
     public List<List<String>> groupAnagrams(String[] strs) {
-        Map <String, List<String>> map = new HashMap<>();
-        List<List<String>> result = new ArrayList<>();
-        for (String str : strs) {
-            char[] charArray = str.toCharArray();
-            Arrays.sort(charArray);
-            String key = new String(charArray);
-            if (map.containsKey(key)) {
-                map.get(key).add(str);
+        Map<String, List<String>> map = new HashMap<>();
+        for (String s : strs) {
+            int[] count = new int[26];
+            for (char c : s.toCharArray()) {
+                count[c - 'a']++;
             }
-            else {
-                map.put(key, new ArrayList<>());
-                map.get(key).add(str);
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < 26; i++) {
+                sb.append(count[i]).append('#');
             }
+            String key = sb.toString();
+            map.computeIfAbsent(key, a -> new ArrayList<>()).add(s);
         }
-        result = new ArrayList<>(map.values());
-        return result;
+        return new ArrayList<>(map.values());
     }
 }
