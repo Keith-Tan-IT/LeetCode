@@ -1,10 +1,10 @@
 class Solution {
     public String reverseWords(String s) {
-        String[] splitted = s.split("\\s+");
-        String reversed = "";
-        for (int i = splitted.length - 1; i >= 0; i--) {
-            reversed += splitted[i] + " ";
+        String[] str = s.trim().split("\\s+");
+        String result = "";
+        for (int i = str.length - 1; i > 0; i--) {
+            result += str[i] + " ";
         }
-        return reversed.trim();
+        return result + str[0];
     }
 }
