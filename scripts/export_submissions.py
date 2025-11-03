@@ -31,7 +31,7 @@ query submissions($offset: Int!, $limit: Int!) {
       statusDisplay
       lang
       timestamp
-      code
+      codeRaw
     }
   }
 }
