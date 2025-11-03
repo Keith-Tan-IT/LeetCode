@@ -52,8 +52,7 @@ class Solution {
         }
         int spaceBetween = spaceNo / (words.length - 1);
         int spaceLeft = spaceNo % (words.length - 1);
-        String spaceString = " ".repeat(spaceBetween);
-        String result = String.join(spaceString, words);
+        String result = String.join(" ".repeat(spaceBetween), words);
         return result + " ".repeat(spaceLeft);
     }
 }
