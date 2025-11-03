@@ -4,6 +4,7 @@ import datetime
 from pathlib import Path
 import subprocess
 import json
+import time
 
 # --- Config ---
 LEETCODE_SESSION = os.getenv("LEETCODE_SESSION")
@@ -21,9 +22,11 @@ headers = {
     "content-type": "application/json",
 }
 
-query = """
+# --- Query 1: Get list of submissions (no code) ---
+query_list = """
 query submissions($offset: Int!, $limit: Int!) {
   submissionList(offset: $offset, limit: $limit) {
+    hasNext
     submissions {
       id
       title
@@ -31,49 +34,66 @@ query submissions($offset: Int!, $limit: Int!) {
       statusDisplay
       lang
       timestamp
-      codeRaw
     }
   }
 }
 """
 
-def fetch_submissions(limit=20):
+# --- Query 2: Get submission code ---
+query_detail = """
+query submissionDetails($id: Int!) {
+  submissionDetails(submissionId: $id) {
+    id
+    code
+    timestamp
+  }
+}
+"""
+
+def fetch_submissions(limit=50):
     submissions = []
     offset = 0
     while True:
         variables = {"offset": offset, "limit": limit}
-        r = requests.post(graphql_url, json={"query": query, "variables": variables}, headers=headers)
-        try:
-            data = r.json()
-        except Exception:
-            print("❌ Failed to parse JSON")
-            print(r.text)
-            break
+        r = requests.post(graphql_url, json={"query": query_list, "variables": variables}, headers=headers)
+        data = r.json()
 
         if "errors" in data:
             print("❌ GraphQL error:", data["errors"])
             break
 
-        if "data" not in data or "submissionList" not in data["data"]:
-            print("❌ Unexpected response:", json.dumps(data, indent=2))
-            break
-
-        subs = data["data"]["submissionList"]["submissions"]
+        sublist = data.get("data", {}).get("submissionList", {})
+        subs = sublist.get("submissions", [])
         if not subs:
             break
+
         submissions.extend(subs)
+        if not sublist.get("hasNext"):
+            break
         offset += limit
+        time.sleep(0.2)  # avoid hitting rate limit
     return submissions
+
+def fetch_code(sub_id):
+    """Fetch the full code for a specific submission."""
+    r = requests.post(graphql_url, json={"query": query_detail, "variables": {"id": int(sub_id)}}, headers=headers)
+    data = r.json()
+    if "errors" in data:
+        print("⚠️ Failed to fetch code for ID", sub_id, ":", data["errors"])
+        return None
+    return data.get("data", {}).get("submissionDetails", {}).get("code")
 
 def git_commit(filepath, message, dt):
     date_str = dt.strftime("%Y-%m-%d %H:%M:%S")
     env = os.environ.copy()
-    env["GIT_AUTHOR_DATE"] = date_str
-    env["GIT_COMMITTER_DATE"] = date_str
-    env["GIT_AUTHOR_NAME"] = GIT_NAME
-    env["GIT_COMMITTER_NAME"] = GIT_NAME
-    env["GIT_AUTHOR_EMAIL"] = GIT_EMAIL
-    env["GIT_COMMITTER_EMAIL"] = GIT_EMAIL
+    env.update({
+        "GIT_AUTHOR_DATE": date_str,
+        "GIT_COMMITTER_DATE": date_str,
+        "GIT_AUTHOR_NAME": GIT_NAME,
+        "GIT_COMMITTER_NAME": GIT_NAME,
+        "GIT_AUTHOR_EMAIL": GIT_EMAIL,
+        "GIT_COMMITTER_EMAIL": GIT_EMAIL,
+    })
 
     subprocess.run(["git", "add", filepath], env=env, check=True)
     subprocess.run(["git", "commit", "-m", message], env=env, check=True)
@@ -82,21 +102,15 @@ def git_commit(filepath, message, dt):
 def save_submission(sub):
     title_slug = sub["titleSlug"]
     lang = sub["lang"]
-    code = sub["code"]
+    code = fetch_code(sub["id"])
+    if not code:
+        return
 
     ext_map = {
-        "python3": "py",
-        "cpp": "cpp",
-        "java": "java",
-        "c": "c",
-        "csharp": "cs",
-        "javascript": "js",
-        "typescript": "ts",
-        "ruby": "rb",
-        "go": "go",
-        "swift": "swift",
-        "kotlin": "kt",
-        "rust": "rs",
+        "python3": "py", "cpp": "cpp", "java": "java", "c": "c",
+        "csharp": "cs", "javascript": "js", "typescript": "ts",
+        "ruby": "rb", "go": "go", "swift": "swift",
+        "kotlin": "kt", "rust": "rs"
     }
     ext = ext_map.get(lang.lower(), "txt")
 
