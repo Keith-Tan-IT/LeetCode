@@ -40,19 +40,10 @@
 
 class Solution {
     public String reorderSpaces(String text) {
-        String[] words = text.trim().split("\\s+");
-        int spaceNo = 0;
-        for (int i = 0; i < text.length(); i++) {
-            if (text.charAt(i) == ' ') {
-                spaceNo++;
-            }
-        }
-        if (words.length == 1) {
-            return words[0] + " ".repeat(spaceNo);
-        }
-        int spaceBetween = spaceNo / (words.length - 1);
-        int spaceLeft = spaceNo % (words.length - 1);
-        String result = String.join(" ".repeat(spaceBetween), words);
-        return result + " ".repeat(spaceLeft);
+        String[] w = text.trim().split("\\s+");
+        int spaces = (int) text.chars().filter(c -> c == ' ').count();
+        if (w.length == 1) return w[0] + " ".repeat(spaces);
+        return String.join(" ".repeat(spaces / (w.length - 1)), w)
+             + " ".repeat(spaces % (w.length - 1));
     }
 }
