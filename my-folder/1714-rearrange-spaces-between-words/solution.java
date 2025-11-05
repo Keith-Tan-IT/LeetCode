@@ -3,24 +3,23 @@
  * Problem: 1592. Rearrange Spaces Between Words
  *
  * Summary:
- * - Redistribute all spaces in a text evenly between words.
- * - If leftover spaces exist, append them at the end.
+ * - Redistribute all spaces evenly between words.
+ * - Append leftover spaces at the end.
  * - Maintain total space count and word order.
  *
  * ----------------------------------------------------------------
- * Step-by-step:
- * 1️⃣ Count total spaces.
- * 2️⃣ Split words using `split("\\s+")`.
+ * Steps:
+ * 1️⃣ Count total spaces & extract words manually.
+ * 2️⃣ Handle one-word edge case (all spaces go to end).
  * 3️⃣ Compute:
  *      - spacesBetween = totalSpaces / (numWords - 1)
- *      - spacesLeft = totalSpaces % (numWords - 1)
- * 4️⃣ Join with " ".repeat(spacesBetween)
- * 5️⃣ Append leftover spaces.
+ *      - spacesLeft    = totalSpaces % (numWords - 1)
+ * 4️⃣ Build result using helper `createSpace()`.
  *
  * ----------------------------------------------------------------
  * Edge Cases:
- * - Only one word → all spaces go to the end.
- * - Leading/trailing/multiple spaces are all preserved correctly.
+ * - Single word → all spaces at the end.
+ * - Handles leading/trailing/multiple spaces gracefully.
  *
  * ----------------------------------------------------------------
  * Example:
@@ -31,19 +30,53 @@
  * Complexity:
  * Time  = O(n)
  * Space = O(n)
- *
- * ----------------------------------------------------------------
- * Key Takeaways:
- * - Use `split("\\s+")` to handle variable spaces.
- * - Use `" ".repeat(n)` and `String.join()` for clean concatenation.
  */
 
 class Solution {
     public String reorderSpaces(String text) {
-        String[] w = text.trim().split("\\s+");
-        int spaces = (int) text.chars().filter(c -> c == ' ').count();
-        if (w.length == 1) return w[0] + " ".repeat(spaces);
-        return String.join(" ".repeat(spaces / (w.length - 1)), w)
-             + " ".repeat(spaces % (w.length - 1));
+        List<String> words = new ArrayList<>();
+        int spaceCount = 0;
+        StringBuilder eachWord = new StringBuilder();
+
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if (c == ' ') {
+                spaceCount++;
+                if (eachWord.length() > 0) {
+                    words.add(eachWord.toString());
+                    eachWord.setLength(0);
+                }
+            }
+            else {
+                eachWord.append(c);
+            }
+        }
+        if (eachWord.length() > 0) {
+            words.add(eachWord.toString());
+        }
+
+        if (words.size() == 1) {
+            return words.get(0) + createSpace(spaceCount).toString();
+        }
+        int spaceBetween = spaceCount / (words.size() - 1);
+        int lastSpace = spaceCount % (words.size() - 1);
+
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < words.size(); i++) {
+            result.append(words.get(i));
+            if (i < words.size() - 1) {
+                result.append(createSpace(spaceBetween));
+            }
+        }
+        result.append(createSpace(lastSpace));
+        return result.toString();
+    }
+
+    public String createSpace (int n) {
+        StringBuilder space = new StringBuilder();
+        for (int i = 0; i < n; i++) {
+            space.append(' ');
+        }
+        return space.toString();
     }
 }
