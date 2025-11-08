@@ -3,6 +3,46 @@ _Newest tips first_
 
 
 ---
+# Tip — 1592. Rearrange Spaces Between Words
+# Tip — 1592. Rearrange Spaces Between Words
+
+/**
+ * TIP
+ * Problem: 1592. Rearrange Spaces Between Words
+ *
+ * Summary:
+ * - Redistribute all spaces evenly between words.
+ * - Append leftover spaces at the end.
+ * - Maintain total space count and word order.
+ *
+ * ----------------------------------------------------------------
+ * Steps:
+ * 1️⃣ Count total spaces & extract words manually.
+ * 2️⃣ Handle one-word edge case (all spaces go to end).
+ * 3️⃣ Compute:
+ *      - spacesBetween = totalSpaces / (numWords - 1)
+ *      - spacesLeft    = totalSpaces % (numWords - 1)
+ * 4️⃣ Build result using helper `createSpace()`.
+ *
+ * ----------------------------------------------------------------
+ * Edge Cases:
+ * - Single word → all spaces at the end.
+ * - Handles leading/trailing/multiple spaces gracefully.
+ *
+ * ----------------------------------------------------------------
+ * Example:
+ * Input:  "  this   is  a sentence "
+ * Output: "this   is   a   sentence"
+ *
+ * ----------------------------------------------------------------
+ * Complexity:
+ * Time  = O(n)
+ * Space = O(n)
+ */
+
+
+
+---
 # Tip — 1071. Greatest Common Divisor of Strings
 # Tip — 1071. Greatest Common Divisor of Strings
 
@@ -445,6 +485,82 @@ Tip — Adding a Copy Instead of a Reference *
 
 
 ---
+# Tip —  * Problem context: LeetCode 54 — Spiral Matrix
+# Tip —  * Problem context: LeetCode 54 — Spiral Matrix
+
+/**
+ * TIP
+ * Problem context: LeetCode 54 — Spiral Matrix
+ *
+ * Summary:
+ * - Traverse an m×n matrix in clockwise spiral order.
+ * - Example:
+ *   Input: [[1,2,3],[4,5,6],[7,8,9]]
+ *   Output: [1,2,3,6,9,8,7,4,5]
+ *
+ * ----------------------------------------------------------------
+ * Implementation Strategy:
+ * 
+ * Maintain 4 boundaries:
+ *   top = 0, bottom = m-1
+ *   left = 0, right = n-1
+ *
+ * Repeat while (top <= bottom && left <= right):
+ *   1️⃣ Traverse Left → Right (top row), then top++
+ *   2️⃣ Traverse Top → Bottom (right column), then right--
+ *   3️⃣ Traverse Right → Left (bottom row, if top ≤ bottom), then bottom--
+ *   4️⃣ Traverse Bottom → Top (left column, if left ≤ right), then left++
+ *
+ * ----------------------------------------------------------------
+ * Complexity:
+ * | Operation | Time | Space |
+ * |------------|------|-------|
+ * | Spiral traversal | O(m*n) | O(1) |
+ *
+ * ----------------------------------------------------------------
+ * Pitfalls:
+ * - ❌ Forgetting to check bounds (top ≤ bottom, left ≤ right).
+ * - ❌ Increment/decrement boundaries at wrong place → duplicates.
+ * - ⚠️ Edge case: single row or single column.
+ *
+ * ----------------------------------------------------------------
+ * Example Walkthrough:
+ * matrix = [
+ *   [1, 2, 3],
+ *   [4, 5, 6],
+ *   [7, 8, 9]
+ * ]
+ * → Traverse 1→2→3→6→9→8→7→4→5
+ *
+ * ----------------------------------------------------------------
+ * Clean Implementation:
+ *
+ * class Solution {
+ *     public List<Integer> spiralOrder(int[][] matrix) {
+ *         List<Integer> result = new ArrayList<>();
+ *         if (matrix == null || matrix.length == 0) return result;
+ *         int top = 0, bottom = matrix.length - 1;
+ *         int left = 0, right = matrix[0].length - 1;
+ *         while (top <= bottom && left <= right) {
+ *             for (int j = left; j <= right; j++) result.add(matrix[top][j]);
+ *             top++;
+ *             for (int i = top; i <= bottom; i++) result.add(matrix[i][right]);
+ *             right--;
+ *             if (top <= bottom)
+ *                 for (int j = right; j >= left; j--) result.add(matrix[bottom][j]);
+ *             bottom--;
+ *             if (left <= right)
+ *                 for (int i = bottom; i >= top; i--) result.add(matrix[i][left]);
+ *             left++;
+ *         }
+ *         return result;
+ *     }
+ * }
+ */
+
+
+
+---
 # Tip —  * Problem context: LeetCode 53 — Maximum Subarray
 # Tip —  * Problem context: LeetCode 53 — Maximum Subarray
 
@@ -486,6 +602,79 @@ Tip — Adding a Copy Instead of a Reference *
  *   - Return subarray indices (track start/end).
  *   - 2D max subarray → apply Kadane row-wise.
  *   - Circular max subarray (LeetCode 918).
+ */
+
+
+
+---
+# Tip —  * Problem context: LeetCode 49 — Group Anagrams
+# Tip —  * Problem context: LeetCode 49 — Group Anagrams
+
+/**
+ * TIP
+ * Problem context: LeetCode 49 — Group Anagrams
+ *
+ * Summary:
+ * - Group words that are anagrams (same letters in different order).
+ * - Example: ["eat","tea","tan","ate","nat","bat"]
+ *   → [["eat","tea","ate"], ["tan","nat"], ["bat"]]
+ *
+ * ----------------------------------------------------------------
+ * Implementation Strategies:
+ *
+ * ① Brute Force (Compare every string) ❌
+ *    - For each string, check all others if they are anagrams.
+ *    - Requires character frequency or sorting per comparison.
+ *    - Complexity: O(n² * k log k)
+ *
+ * ② Sort-based HashMap Key ✅
+ *    - Sort each string alphabetically (e.g. "eat" → "aet").
+ *    - Use the sorted string as a key in a HashMap.
+ *    - Group original strings by identical sorted key.
+ *    - Complexity: O(n * k log k)
+ *      (n = number of strings, k = average string length)
+ *
+ * ③ Frequency-count Key (Optimized) ⚡
+ *    - Build 26-length frequency array for each word.
+ *    - Convert to string key like "1#0#0#..." (no sorting needed).
+ *    - Complexity: O(n * k)
+ *    - Avoids O(k log k) sorting cost.
+ *
+ * ----------------------------------------------------------------
+ * Common Pitfalls:
+ * - ❌ Using char[] as key → invalid, since arrays don’t override equals()/hashCode().
+ * - ⚠️ Forgetting to wrap `map.values()` → must convert to `new ArrayList<>(...)`.
+ * - ⚠️ Misusing `map.containsKey(charArray)` instead of `map.containsKey(key)`.
+ *
+ * ----------------------------------------------------------------
+ * Clean & Correct Implementation:
+ *
+ * class Solution {
+ *     public List<List<String>> groupAnagrams(String[] strs) {
+ *         Map<String, List<String>> map = new HashMap<>();
+ *         for (String s : strs) {
+ *             char[] ca = s.toCharArray();
+ *             Arrays.sort(ca);
+ *             String key = new String(ca);
+ *             map.computeIfAbsent(key, k -> new ArrayList<>()).add(s);
+ *         }
+ *         return new ArrayList<>(map.values());
+ *     }
+ * }
+ *
+ * ----------------------------------------------------------------
+ * Complexity Comparison:
+ * | Method              | Time       | Space | Notes                      |
+ * |----------------------|------------|--------|----------------------------|
+ * | Brute Force          | O(n² * k)  | O(1)  | Too slow                   |
+ * | Sorting Key ✅        | O(n * k log k) | O(n * k) | Simple & clean          |
+ * | Frequency Key ⚡      | O(n * k)  | O(n * k) | Fastest, avoids sorting   |
+ *
+ * ----------------------------------------------------------------
+ * Key Takeaways:
+ * - Always convert sorted char[] → String before using as map key.
+ * - `computeIfAbsent()` is a concise, safer alternative to if-else checks.
+ * - Use `map.values()` + `new ArrayList<>(...)` to return grouped results.
  */
 
 
@@ -539,6 +728,34 @@ Tip — Adding a Copy Instead of a Reference *
  * - Must skip duplicates at 3 places: i, left, right.
  * - Build triplets with `Arrays.asList()`, `List.of()`, or manual new ArrayList.
  */
+
+
+
+---
+# Tip — 3. Longest Substring Without Repeating Characters
+# Tip — 3. Longest Substring Without Repeating Characters
+
+/**
+ * TIP:
+ * Problem: 3. Longest Substring Without Repeating Characters
+ * 
+ * \U0001f539 Approach: Sliding Window + HashSet
+ * - Use two pointers `left` and `i` to form a window [left, i].
+ * - Add characters to a HashSet to ensure all are unique.
+ * - If a duplicate is found, shrink window from the left until the duplicate is removed.
+ * - Update `max` at each step as `i - left + 1`.
+ * 
+ * \U0001f539 Example:
+ * s = "pwwkew"
+ * - Window expands and contracts as duplicates are found.
+ * - Longest substring without repeats: "wke" → length = 3
+ * 
+ * ⏱️ Time Complexity: O(n)
+ * \U0001f4be Space Complexity: O(min(n, charset))
+ * 
+ * This is the optimal solution using a dynamic sliding window.
+ */
+
 
 
 ---
