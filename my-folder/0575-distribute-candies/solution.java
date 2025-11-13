@@ -5,11 +5,6 @@ class Solution {
         for (int candy : candyType) {
             set.add(candy);
         }
-        if (set.size() >= n / 2) {
-            return n / 2;
-        }
-        else {
-            return set.size();
-        }
+        return Math.min(n/ 2, set.size());
     }
 }
