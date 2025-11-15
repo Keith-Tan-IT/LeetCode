@@ -76,8 +76,7 @@ class RandomizedSet {
     }
     
     public int getRandom() {
-        int index = random.nextInt(list.size());
-        return list.get(index);
+        return list.get(random.nextInt(list.size()));
     }
 }
 
