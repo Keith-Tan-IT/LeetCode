@@ -50,7 +50,7 @@ class RandomizedSet {
     }
     
     public boolean insert(int val) {
-        if (list.contains(val)) {
+        if (map.containsKey(val)) {
             return false;
         }
         else {
