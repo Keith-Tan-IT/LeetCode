@@ -67,7 +67,6 @@ class Solution {
                 int right = map.containsKey(num + 1) ? map.get(num + 1) : 0;
                 int sum = left + right + 1;
                 map.put(num, sum);
-
                 max = Math.max(max, sum);
 
                 map.put(num - left, sum);
