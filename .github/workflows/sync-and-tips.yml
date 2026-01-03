@@ -42,14 +42,16 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          # Stage modified/new TIPs
+      
           git add my-folder/*/TIP.md my-folder/TIPS.md
-
-          # Commit only if there's a difference
+      
           if ! git diff --cached --quiet; then
             git commit -m "chore(tips): sync updated TIPs"
+      
+            # 🔑 CRITICAL FIX
+            git pull --rebase origin main
             git push origin main
           else
             echo "No new or updated TIPs found."
           fi
+
