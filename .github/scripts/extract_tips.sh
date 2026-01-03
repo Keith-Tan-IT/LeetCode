@@ -28,28 +28,40 @@ for folder in "$LEETCODE_FOLDER"/*/; do
 
     # awk prints each matching block followed by a NUL character
     while IFS= read -r -d '' block; do
-      # trim trailing newlines (just in case)
-      block="${block%%$'\n'}"
       BLOCKS+=("$block")
     done < <(awk '
-      BEGIN { inblock=0; buf=""; hasTip=0 }
+      BEGIN {
+        inblock = 0
+        buf = ""
+        hasTip = 0
+      }
+    
       /^\s*\/\*\*/ {
-        inblock=1; buf=$0 "\n"; hasTip=0
+        inblock = 1
+        buf = $0 "\n"
+        hasTip = 0
         next
       }
+    
       inblock {
         buf = buf $0 "\n"
-        # detect a TIP line inside the block: typically " * TIP" but we accept anywhere in the block
-        if (tolower($0) ~ /(^|\s)\*\s*tip\b/ || tolower($0) ~ /tip/) hasTip=1
+    
+        # STRICT detection: "* TIP" only
+        if ($0 ~ /^\s*\*\s*TIP\b/) {
+          hasTip = 1
+        }
       }
+    
       /^\s*\*\// {
         if (inblock && hasTip) {
-          # output block followed by NUL so bash can split safely
           printf "%s\0", buf
         }
-        inblock=0; buf=""; hasTip=0
+        inblock = 0
+        buf = ""
+        hasTip = 0
       }
     ' "$file")
+
   done
   shopt -u nullglob
 
@@ -86,18 +98,23 @@ for folder in "$LEETCODE_FOLDER"/*/; do
     echo "Removed old aggregated entry for: $PROBLEM_LINE"
   fi
 
-  # Prepend the new tip (newest-first) keeping the file header (first 3 lines)
+  # rebuild aggregated file from scratch (source of truth = per-problem TIP.md)
   TMP_AGG=$(mktemp)
+  
   {
-    head -n 3 "$AGG_FILE"
+    echo "# 📘 LeetCode Tips Cheat Sheet"
+    echo "_Newest tips first_"
     echo ""
-    echo "---"
-    echo "# Tip — $PROBLEM_LINE"
-    cat "$TIP_FILE"
-    echo ""
-    tail -n +4 "$AGG_FILE"
+  
+    for tip in $(ls -t "$LEETCODE_FOLDER"/*/TIP.md 2>/dev/null); do
+      echo "---"
+      cat "$tip"
+      echo ""
+    done
   } > "$TMP_AGG"
+  
   mv "$TMP_AGG" "$AGG_FILE"
+
 done
 
 echo "✅ Aggregated TIPS.md updated successfully at: $AGG_FILE"
