@@ -1,3 +1,56 @@
+/**
+ * TIP
+ * Problem: 116. Populating Next Right Pointers in Each Node
+ *
+ * Goal:
+ * - Connect each node’s next pointer to its right neighbor.
+ * - Must use O(1) extra space.
+ *
+ * -------------------------------------------------------------
+ * Key Insight:
+ * - Tree is PERFECT:
+ *   → every node has 2 children
+ *   → all leaves at same level
+ *
+ * -------------------------------------------------------------
+ * Core Trick:
+ * - Use already established `next` pointers.
+ * - No queue needed.
+ *
+ * -------------------------------------------------------------
+ * Pointer Connections:
+ * - node.left.next  = node.right
+ * - node.right.next = node.next.left (if node.next exists)
+ *
+ * -------------------------------------------------------------
+ * Algorithm:
+ * 1) Start from the leftmost node of each level.
+ * 2) Traverse the level using `next` pointers.
+ * 3) Connect children while moving horizontally.
+ * 4) Move down to the next level.
+ *
+ * -------------------------------------------------------------
+ * Example:
+ * Input:
+ *        1
+ *      /   \
+ *     2     3
+ *
+ * Output:
+ * 2.next → 3
+ *
+ * -------------------------------------------------------------
+ * Complexity:
+ * Time  = O(n)
+ * Space = O(1)
+ *
+ * -------------------------------------------------------------
+ * Takeaways:
+ * - Perfect tree enables pointer-only traversal.
+ * - BFS is easy but not optimal.
+ * - This pattern is reused in many pointer problems.
+ */
+
 /*
 // Definition for a Node.
 class Node {
@@ -26,18 +79,22 @@ class Solution {
         if (root == null) {
             return null;
         }
-        Queue<Node> queue = new LinkedList<>();
-        queue.offer(root);
-        while (!queue.isEmpty()) {
-            int size = queue.size();
-            Node rightNode = null;
+        Queue<Node> q = new LinkedList<>();
+        q.offer(root);
+        while(!q.isEmpty()) {
+            int size = q.size();
+            Node prev = null;
             for (int i = 0; i < size; i++) {
-                Node curr = queue.poll();
-                curr.next = rightNode;
-                rightNode = curr;
+                Node curr = q.poll();
+                if (prev != null) {
+                    prev.next = curr;
+                }
+                prev = curr;
+                if (curr.left != null) {
+                    q.offer(curr.left);
+                }
                 if (curr.right != null) {
-                    queue.offer(curr.right);
-                    queue.offer(curr.left);
+                    q.offer(curr.right);
                 }
             }
         }
