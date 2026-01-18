@@ -3,53 +3,55 @@
  * Problem: 116. Populating Next Right Pointers in Each Node
  *
  * Goal:
- * - Connect each node’s next pointer to its right neighbor.
- * - Must use O(1) extra space.
+ * - Connect each node to its next right node.
+ * - Use O(1) extra space.
+ *
+ * -------------------------------------------------------------
+ * Tree Property:
+ * - Perfect binary tree
+ * - Every parent has BOTH left and right children
  *
  * -------------------------------------------------------------
  * Key Insight:
- * - Tree is PERFECT:
- *   → every node has 2 children
- *   → all leaves at same level
+ * - Use already established next pointers from parent level
+ * - Build connections top-down
  *
  * -------------------------------------------------------------
- * Core Trick:
- * - Use already established `next` pointers.
- * - No queue needed.
- *
- * -------------------------------------------------------------
- * Pointer Connections:
- * - node.left.next  = node.right
- * - node.right.next = node.next.left (if node.next exists)
+ * Core Connections:
+ * 1) left.next = right
+ * 2) right.next = parent.next.left (if parent.next exists)
  *
  * -------------------------------------------------------------
  * Algorithm:
- * 1) Start from the leftmost node of each level.
- * 2) Traverse the level using `next` pointers.
- * 3) Connect children while moving horizontally.
- * 4) Move down to the next level.
+ * - If root is null → return
+ * - Connect root.left → root.right
+ * - If root.next exists → connect root.right → root.next.left
+ * - Recurse left, then right
  *
  * -------------------------------------------------------------
  * Example:
- * Input:
+ * Tree:
  *        1
  *      /   \
  *     2     3
+ *    / \   / \
+ *   4  5  6   7
  *
- * Output:
- * 2.next → 3
+ * Result:
+ * 4 → 5 → 6 → 7 → null
  *
  * -------------------------------------------------------------
  * Complexity:
  * Time  = O(n)
- * Space = O(1)
+ * Space = O(h) recursion stack
  *
  * -------------------------------------------------------------
  * Takeaways:
- * - Perfect tree enables pointer-only traversal.
- * - BFS is easy but not optimal.
- * - This pattern is reused in many pointer problems.
+ * - This solution ONLY works for perfect binary trees
+ * - Relies on parent-level next pointers
+ * - No queue, no extra data structure
  */
+
 
 /*
 // Definition for a Node.
@@ -79,16 +81,13 @@ class Solution {
         if (root == null) {
             return null;
         }
-        Node leftMost = root;
-        while (leftMost.left != null) {
-            Node curr = leftMost;
-            curr.left.next = curr.right;
-            while (curr.next != null) {
-                curr.right.next = curr.next.left;
-                curr = curr.next;
-                curr.left.next = curr.right;
+        if (root.left != null) {
+            root.left.next = root.right;
+            if (root.next != null) {
+                root.right.next = root.next.left;
             }
-            leftMost = leftMost.left;
+            connect(root.left);
+            connect(root.right);
         }
         return root;
     }
