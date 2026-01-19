@@ -1,14 +1,10 @@
 class Solution {
     public boolean isBalanced(String num) {
-        int odd = 0, even = 0;
+        int diff = 0, sign = 1;
         for (int i = 0; i < num.length(); i++) {
-            if (i % 2 == 0) {
-                even += (num.charAt(i) - '0');
-            }
-            else {
-                odd += (num.charAt(i) - '0');
-            }
+            diff += sign * (num.charAt(i) - '0');
+            sign *= -1; 
         }
-        return even == odd;
+        return diff == 0;
     }
 }
