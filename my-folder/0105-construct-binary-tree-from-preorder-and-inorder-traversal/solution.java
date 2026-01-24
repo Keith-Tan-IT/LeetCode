@@ -67,16 +67,16 @@ class Solution {
         for (int i = 0; i < inorder.length; i++) {
             inorderMap.put(inorder[i], i);
         }
-        return helper(preorder, 0, inorder.length);
+        return helper(preorder, 0, inorder.length - 1);
     }
     public TreeNode helper(int[] preorder, int inLeft, int inRight) {
-        if (inLeft >= inRight) {
+        if (inLeft > inRight) {
             return null;
         }
         int rootVal = preorder[preIndex++];
         TreeNode root = new TreeNode(rootVal);
         int mid = inorderMap.get(rootVal);
-        root.left = helper(preorder, inLeft, mid);
+        root.left = helper(preorder, inLeft, mid - 1);
         root.right = helper(preorder, mid + 1, inRight);
         return root;
     }
