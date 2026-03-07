@@ -75,7 +75,6 @@
  * }
  */
 class Solution {
-    List<TreeNode> list = new ArrayList<>();
     public void flatten(TreeNode root) {
         if (root == null) {
             return;
@@ -93,3 +92,4 @@ class Solution {
         curr.right = right;
     }
 }
+
