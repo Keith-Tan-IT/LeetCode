@@ -4,15 +4,15 @@
  *
  * Summary:
  * - Find all unique triplets [a, b, c] such that a + b + c = 0.
- * - Extension of the "2Sum" problem with an outer loop.
- * - Key approach: Sort the array and use the two-pointer method.
+ * - Classic variation of "2Sum" extended with an outer loop.
+ * - Key: Sort the array + use two pointers.
  *
  * Implementation Strategy:
  * 1. Sort the array.
- * 2. Loop with index `i` as the first element.
+ * 2. Loop with index `i` (the first number).
  * 3. Use two pointers (`left = i+1`, `right = n-1`) to find pairs
- *    that sum with nums[i] to 0.
- * 4. Skip duplicates at all levels (`i`, `left`, `right`).
+ *    that complete the triplet.
+ * 4. Skip duplicates for both `i`, `left`, and `right`.
  *
  * Implementation Variants:
  *
@@ -23,27 +23,26 @@
  * | HashSet (2Sum variant)  | O(n²)      | O(n)  |
  *
  * Pitfalls:
- * - Forgetting to skip duplicates → repeated triplets in result.
- * - Wrong left pointer setup → must be `i+1` (not nums[i]+1).
- * - Returning duplicate references → always create fresh triplets.
- * - Outer loop must go only until `nums.length - 2`.
+ * - Forgetting to skip duplicates → leads to repeated triplets.
+ * - Using wrong starting index: `left = i + 1` (NOT `nums[i] + 1`).
+ * - Returning duplicate references instead of a fresh list.
+ * - Loop should stop at `nums.length - 2` (need at least 3 numbers).
  *
  * Example:
  * nums = [-1,0,1,2,-1,-4]
- * Sorted → [-4, -1, -1, 0, 1, 2]
- *
- * i=0 → -4 → no triplet
- * i=1 → -1 → found [-1,-1,2], [-1,0,1]
- * i=2 → -1 (duplicate) → skip
+ * Sorted → [-4,-1,-1,0,1,2]
+ * 
+ * i=0: -4 → no triplet
+ * i=1: -1 → pairs = (0,2), (1,2) → [-1,-1,2], [-1,0,1]
+ * Skip duplicates for i=2
  * Done.
  * Result = [[-1,-1,2], [-1,0,1]]
  *
  * Key points:
- * - Standard solution is sort + two pointers (O(n²)).
- * - Must skip duplicates at 3 places: i, left, right.
- * - Build triplets with `Arrays.asList()`, `List.of()`, or manual new ArrayList.
+ * - Sort + two pointers is the standard O(n²) solution.
+ * - Skip duplicates at 3 levels: i, left, right.
+ * - Use `Arrays.asList(...)`, `List.of(...)`, or new ArrayList to build triplets.
  */
-
 
 class Solution {
     public List<List<Integer>> threeSum(int[] nums) {
@@ -66,12 +65,8 @@ class Solution {
                 else {
                     result.add(Arrays.asList(nums[i], nums[left], nums[right]));
                     left++;
-                    right--;
                     while (left < right && nums[left] == nums[left - 1]) {
                         left++;
-                    }
-                    while (left < right && nums[right] == nums[right + 1]) {
-                        right--;
                     }
                 }
             }
