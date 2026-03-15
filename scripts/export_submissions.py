@@ -75,13 +75,25 @@ def fetch_submissions(limit=50):
     return submissions
 
 def fetch_code(sub_id):
-    """Fetch the full code for a specific submission."""
-    r = requests.post(graphql_url, json={"query": query_detail, "variables": {"id": int(sub_id)}}, headers=headers)
+    r = requests.post(
+        graphql_url,
+        json={"query": query_detail, "variables": {"id": int(sub_id)}},
+        headers=headers
+    )
+
     data = r.json()
+
     if "errors" in data:
         print("⚠️ Failed to fetch code for ID", sub_id, ":", data["errors"])
         return None
-    return data.get("data", {}).get("submissionDetails", {}).get("code")
+
+    details = data.get("data", {}).get("submissionDetails")
+
+    if not details:
+        print(f"⚠️ submissionDetails missing for {sub_id}")
+        return None
+
+    return details.get("code")
 
 def git_commit(filepath, message, dt):
     date_str = dt.strftime("%Y-%m-%d %H:%M:%S")
